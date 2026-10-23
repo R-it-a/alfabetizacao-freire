@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+
+# Fontes primárias ficam só locais (direito autoral); ver fontes/README.md
+fontes/*
+!fontes/README.md

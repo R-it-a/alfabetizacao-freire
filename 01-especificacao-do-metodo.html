@@ -1,0 +1,1101 @@
+<title>Método Paulo Freire → Software</title>
+
+<style>
+  :root {
+    --ground:      #F2F4F7;
+    --ground-2:    #FFFFFF;
+    --ground-3:    #E4E8EF;
+    --rule:        #C9D1DE;
+    --text:        #161B24;
+    --text-2:      #4A5464;
+    --text-3:      #6E7889;
+    --ink:         #1B3A6B;
+    --ink-soft:    #E3EAF6;
+    --luz:         #A8741A;
+    --luz-soft:    #F6EBD5;
+    --shadow:      0 1px 2px rgba(22,27,36,.06), 0 8px 24px -12px rgba(22,27,36,.18);
+
+    --f-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --f-body:    ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --f-mono:    ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --measure: 34rem;
+    --wide: 64rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:   #0E131C;
+      --ground-2: #151C28;
+      --ground-3: #1D2634;
+      --rule:     #2C3849;
+      --text:     #E8ECF3;
+      --text-2:   #AEB9C9;
+      --text-3:   #7E8B9D;
+      --ink:      #8CB0EC;
+      --ink-soft: #182740;
+      --luz:      #E0AE55;
+      --luz-soft: #2A2214;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #0E131C;
+    --ground-2: #151C28;
+    --ground-3: #1D2634;
+    --rule:     #2C3849;
+    --text:     #E8ECF3;
+    --text-2:   #AEB9C9;
+    --text-3:   #7E8B9D;
+    --ink:      #8CB0EC;
+    --ink-soft: #182740;
+    --luz:      #E0AE55;
+    --luz-soft: #2A2214;
+    --shadow:   0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #F2F4F7;
+    --ground-2:    #FFFFFF;
+    --ground-3:    #E4E8EF;
+    --rule:        #C9D1DE;
+    --text:        #161B24;
+    --text-2:      #4A5464;
+    --text-3:      #6E7889;
+    --ink:         #1B3A6B;
+    --ink-soft:    #E3EAF6;
+    --luz:         #A8741A;
+    --luz-soft:    #F6EBD5;
+    --shadow:      0 1px 2px rgba(22,27,36,.06), 0 8px 24px -12px rgba(22,27,36,.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { overflow-x: hidden; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 3rem);
+  }
+
+  .col { max-width: var(--measure); }
+
+  /* min-width:auto é o default em grid/flex items: sem isto, um <pre> ou uma
+     tabela de linha longa se recusa a encolher e estoura a página inteira. */
+  .grid > *, .grid-2 > *, .split > *,
+  .stack > *, .stack-s > *, .stack-l > * { min-width: 0; }
+
+  /* ---------- type ---------- */
+
+  h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    line-height: 1.02;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    font-weight: 750;
+    letter-spacing: -.028em;
+    line-height: 1.1;
+  }
+
+  h3 {
+    font-size: 1.16rem;
+    font-weight: 700;
+    letter-spacing: -.012em;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  p { margin: 0; }
+
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  strong { font-weight: 700; color: var(--text); }
+
+  .lede {
+    font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--luz);
+  }
+
+  .mono { font-family: var(--f-mono); }
+
+  .note {
+    font-size: .93rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  /* ---------- layout primitives ---------- */
+
+  .stack   { display: flex; flex-direction: column; gap: 1rem; }
+  .stack-s { display: flex; flex-direction: column; gap: .5rem; }
+  .stack-l { display: flex; flex-direction: column; gap: 2rem; }
+
+  section { padding-block: clamp(3rem, 7vw, 5.5rem); border-top: 1px solid var(--rule); }
+  section:first-of-type { border-top: none; }
+
+  .sec-head {
+    display: flex;
+    gap: 1.25rem;
+    align-items: baseline;
+    margin-bottom: 2.5rem;
+  }
+
+  .sec-num {
+    font-family: var(--f-mono);
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--luz);
+    letter-spacing: .1em;
+    padding-top: .35em;
+    flex: none;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header {
+    padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .rule-luz {
+    width: 3.5rem;
+    height: 3px;
+    background: var(--luz);
+    margin-bottom: 1.75rem;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: .74rem;
+    letter-spacing: .04em;
+    color: var(--text-3);
+  }
+
+  /* ---------- cards ---------- */
+
+  .card {
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  }
+
+  .grid-2 {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  }
+
+  /* ---------- phase list ---------- */
+
+  ol.phases {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: ph;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ol.phases li {
+    counter-increment: ph;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0 1rem;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  ol.phases li:last-child { border-bottom: 1px solid var(--rule); }
+
+  ol.phases li::before {
+    content: counter(ph);
+    font-family: var(--f-mono);
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--ink-soft);
+    width: 1.7rem;
+    height: 1.7rem;
+    display: grid;
+    place-items: center;
+    border-radius: 2px;
+    margin-top: .15rem;
+  }
+
+  /* ---------- ficha (the syllable grid) ---------- */
+
+  .ficha-shell {
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .ficha-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: .85rem 1.25rem;
+    background: var(--ground-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .ficha-body { padding: 1.5rem 1.25rem; }
+
+  .ficha-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .4rem;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .syl {
+    font-family: var(--f-mono);
+    font-size: clamp(.95rem, 3.4vw, 1.35rem);
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    padding: .6rem .2rem;
+    background: var(--ground);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s, transform .08s;
+  }
+
+  .syl:hover { border-color: var(--ink); color: var(--ink); }
+  .syl:active { transform: translateY(1px); }
+  .syl:focus-visible { outline: 2px solid var(--luz); outline-offset: 2px; }
+
+  .assembler {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.4rem;
+  }
+
+  .word-slot {
+    font-family: var(--f-mono);
+    font-size: clamp(1.4rem, 5vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text);
+    min-width: 6rem;
+    text-align: center;
+    padding: .35rem .75rem;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .word-slot.empty { color: var(--text-3); font-weight: 400; letter-spacing: .02em; font-size: 1rem; }
+  .word-slot.hit   { color: var(--luz); border-bottom-color: var(--luz); }
+
+  .btn {
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .5rem .85rem;
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .btn:hover { border-color: var(--ink); color: var(--ink); }
+  .btn:focus-visible { outline: 2px solid var(--luz); outline-offset: 2px; }
+
+  .found {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    min-height: 2.5rem;
+    align-content: flex-start;
+  }
+
+  .chip {
+    font-family: var(--f-mono);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .28rem .6rem;
+    background: var(--luz-soft);
+    color: var(--luz);
+    border-radius: 2px;
+  }
+
+  /* ---------- tables ---------- */
+
+  .tscroll {
+    max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--rule); border-radius: 3px; background: var(--ground-2);
+  }
+
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+
+  th, td {
+    text-align: left;
+    padding: .6rem .85rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    background: var(--ground-3);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.n {
+    font-family: var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+    width: 2.5rem;
+  }
+
+  td.w {
+    font-family: var(--f-mono);
+    font-weight: 700;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+
+  td.fam { font-family: var(--f-mono); color: var(--ink); font-weight: 600; }
+
+  tr.step td { background: var(--luz-soft); }
+
+  /* ---------- code ---------- */
+
+  pre {
+    margin: 0;
+    max-width: 100%;
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: var(--f-mono);
+    font-size: .8rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  pre code { display: block; width: max-content; min-width: 100%; }
+
+  code { font-family: var(--f-mono); font-size: .88em; }
+
+  p code, li code, td code {
+    background: var(--ground-3);
+    padding: .1em .35em;
+    border-radius: 2px;
+    color: var(--text);
+  }
+
+  /* ---------- split (LLM vs código) ---------- */
+
+  .split { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr)); }
+
+  .split .card { display: flex; flex-direction: column; gap: .9rem; }
+
+  .tag {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .25rem .55rem;
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+
+  .tag.a { background: var(--ink-soft); color: var(--ink); }
+  .tag.b { background: var(--luz-soft); color: var(--luz); }
+
+  ul.tick { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .55rem; }
+
+  ul.tick li {
+    padding-left: 1.15rem;
+    position: relative;
+    font-size: .93rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  ul.tick li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: .62em;
+    width: .4rem;
+    height: .4rem;
+    border-radius: 50%;
+    background: var(--rule);
+  }
+
+  ul.plain { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: .5rem; color: var(--text-2); }
+  ul.plain li { font-size: .95rem; line-height: 1.55; }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    border-left: 3px solid var(--luz);
+    background: var(--luz-soft);
+    padding: 1.1rem 1.35rem;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .callout .note { color: var(--text-2); }
+
+  /* ---------- pipeline ---------- */
+
+  ol.pipe { list-style: none; margin: 0; padding: 0; counter-reset: pp; display: flex; flex-direction: column; gap: .5rem; }
+
+  ol.pipe li {
+    counter-increment: pp;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0 .9rem;
+    align-items: start;
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: .8rem 1rem;
+    font-size: .95rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  ol.pipe li::before {
+    content: counter(pp, decimal-leading-zero);
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--text-3);
+    padding-top: .18em;
+  }
+
+  ol.pipe li.hi { border-color: var(--luz); background: var(--luz-soft); }
+  ol.pipe li.hi::before { color: var(--luz); }
+
+  footer {
+    padding-block: 3rem 4rem;
+    border-top: 1px solid var(--rule);
+    font-size: .85rem;
+    color: var(--text-3);
+  }
+
+  footer a { color: var(--text-2); }
+
+  /* ---------- telas estreitas ---------- */
+  @media (max-width: 40rem) {
+    body { font-size: 16px; }
+
+    pre { font-size: .71rem; padding: .85rem .9rem; }
+
+    /* os max-width inline das seções passam da viewport em telas pequenas */
+    .col, .tscroll, .ficha-shell, .callout, .grid, .grid-2, .split,
+    ol.pipe, ol.phases { max-width: 100% !important; }
+
+    .sec-head { gap: .7rem; margin-bottom: 1.5rem; }
+
+    .ficha-grid { gap: .3rem; }
+    .syl { padding: .55rem .1rem; }
+
+    .assembler { gap: .6rem; }
+    .word-slot { min-width: 4.5rem; }
+
+    ol.phases li { grid-template-columns: 1.9rem 1fr; gap: 0 .7rem; }
+    ol.pipe li { grid-template-columns: 1.6rem 1fr; gap: 0 .6rem; padding: .7rem .8rem; }
+
+    td.w { white-space: normal; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="rule-luz"></div>
+    <div class="stack-l col" style="max-width:44rem">
+      <div class="stack">
+        <span class="eyebrow">Especificação de projeto</span>
+        <h1>Método Paulo&nbsp;Freire → Software</h1>
+      </div>
+      <p class="lede">
+        O que as fontes primárias de 1963–65 dizem sobre o método, e como cada peça
+        vira código, prompt, ou nada. Escrito para construir um app de alfabetização
+        de adultos onde a IA ocupa o lugar do coordenador do círculo de cultura.
+      </p>
+    </div>
+    <div class="meta wrap" style="padding:1.25rem 0 0">
+      <span>Angicos / RN · 1963</span>
+      <span>17 palavras · 13 aulas · 40 horas</span>
+      <span>Alvo: PWA + ASR nativo + LLM</span>
+    </div>
+  </header>
+
+  <!-- ============ 1 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div class="stack-s">
+        <h2>O método, como ele realmente funciona</h2>
+        <p class="note col">
+          Freire descreve cinco fases em <em>Educação como Prática da Liberdade</em>. As três
+          primeiras são trabalho de campo; as duas últimas produzem o material.
+        </p>
+      </div>
+    </div>
+
+    <div class="col" style="max-width:46rem">
+      <ol class="phases">
+        <li>
+          <div class="stack-s">
+            <h3>Levantamento do universo vocabular</h3>
+            <p class="note">Conversas informais na comunidade. Em Angicos foram registradas ~400 palavras
+            para chegar a 17. Anota-se a fala como ela é, sem corrigir.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Seleção das palavras geradoras</h3>
+            <p class="note">Três critérios: <strong>riqueza fonêmica</strong>, <strong>dificuldade fonética
+            em ordem crescente</strong>, e <strong>teor pragmático</strong> — a capacidade da palavra de gerar
+            debate sobre a realidade social do grupo.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Criação das situações existenciais</h3>
+            <p class="note">Cada palavra ganha uma cena local que a resume — a codificação. Não é ilustração:
+            é o problema que o grupo vai debater antes de ver a palavra escrita.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Fichas-roteiro</h3>
+            <p class="note">Material do coordenador: subtemas e direções de debate para cada cena.
+            Auxílio, nunca roteiro rígido.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Fichas de decomposição das famílias fonêmicas</h3>
+            <p class="note">A palavra quebrada em sílabas, cada sílaba desdobrada em sua família pela
+            troca da vogal. É o que o aluno leva para casa em cartolina.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="callout col" style="max-width:46rem; margin-top:2rem">
+      <p class="note">
+        <strong>Antes de qualquer palavra vem uma fase de motivação.</strong> Cerca de dez cenas
+        discutidas em grupo — o homem diante da natureza, o índio com arco, o caçador com espingarda,
+        o gato caçando, a mulher fazendo louça de barro, dois cantadores com um rádio ao lado —
+        para chegar num conceito antropológico de cultura: <em>tudo que o homem faz é cultura, logo
+        você já é culto</em>. Só depois disso começa a alfabetização. Freire considerava essa fase
+        indispensável, e é a primeira coisa que qualquer adaptação corta.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div class="stack-s">
+        <h2>O protocolo de uma aula</h2>
+        <p class="note col">
+          Nove quadros, na ordem, para cada palavra geradora. Descrito por Lauro de Oliveira Lima em
+          1963–65, observando os círculos de cultura em funcionamento nas cidades-satélite de Brasília.
+          Este é o algoritmo do método — é ele que vira máquina de estados no app.
+        </p>
+      </div>
+    </div>
+
+    <ol class="pipe col" style="max-width:46rem">
+      <li><strong>Cena.</strong> A codificação projetada, com a palavra discreta no alto. O grupo debate a cena. Quanto mais longo o debate, melhor.</li>
+      <li><strong>Palavra isolada.</strong> Em negrito, sem a cena. O grupo compara com o que viu.</li>
+      <li><strong>Sílabas.</strong> <span class="mono">TI-JO-LO</span> — separadas. Descobre-se que é o movimento da boca que marca a sílaba.</li>
+      <li><strong>Primeira família.</strong> <span class="mono">TA TE TI TO TU</span> — a parte igual e a parte diferente.</li>
+      <li><strong>Segunda família.</strong> <span class="mono">JA JE JI JO JU</span></li>
+      <li><strong>Terceira família.</strong> <span class="mono">LA LE LI LO LU</span></li>
+      <li class="hi"><strong>Ficha da descoberta.</strong> As três famílias juntas. Lê-se na horizontal, vertical, diagonal, de baixo para cima. Daqui parte tudo.</li>
+      <li><strong>Vogais.</strong> <span class="mono">A E I O U</span> — isoladas, para entender por que a chave é tão rica.</li>
+      <li><strong>Próxima palavra.</strong> Recapitula desde a primeira e recomeça.</li>
+    </ol>
+
+    <div class="col" style="max-width:46rem; margin-top:1.75rem">
+      <p class="note">
+        O passo 7 é onde o método acontece. A fonte é explícita: <em>“Todo êxito do método vai depender
+        do bom uso desta ficha. Se não produzir resultados, melhor mesmo é reiniciar tudo de novo.”</em>
+        E o critério de sucesso é operacional — quando a pessoa forma palavras novas sozinha com a
+        ficha, <em>“já está, tecnicamente, alfabetizado”</em>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 — the interactive ficha ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div class="stack-s">
+        <h2>A ficha da descoberta</h2>
+        <p class="note col">
+          Toque nas sílabas para formar palavras, como se fazia com a cartolina em casa.
+          Esta é a de <span class="mono">TIJOLO</span>. O aluno não recebe palavras — ele as descobre,
+          e essa inversão é o núcleo pedagógico inteiro.
+        </p>
+      </div>
+    </div>
+
+    <div class="ficha-shell col" style="max-width:38rem">
+      <div class="ficha-bar">
+        <span class="eyebrow">Ficha nº 7 · palavra geradora TIJOLO</span>
+        <span class="mono" style="font-size:.72rem; color:var(--text-3)">
+          <span id="count">0</span>/20 descobertas
+        </span>
+      </div>
+      <div class="ficha-body">
+        <div class="ficha-grid" id="grid"></div>
+
+        <div class="assembler">
+          <div class="word-slot empty" id="slot">toque nas sílabas</div>
+          <button class="btn" id="clear" type="button">Limpar</button>
+        </div>
+
+        <div class="found" id="found">
+          <span class="note mono" style="font-size:.78rem; color:var(--text-3)">
+            palavras que você descobrir aparecem aqui
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout col" style="max-width:38rem; margin-top:1.5rem">
+      <p class="note">
+        Vinte palavras saem de três famílias. É por isso que 17 palavras geradoras bastam para
+        alfabetizar — a fonte de 1965 registra que <span class="mono">LABUTA</span> destravava a leitura
+        de cerca de 250 palavras. <strong>Essa contagem é calculável offline</strong> contra uma wordlist
+        pt-BR, e vira a métrica de “riqueza fonêmica” que o Freire define qualitativamente.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 — Angicos progression ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div class="stack-s">
+        <h2>A grade fonética de Angicos</h2>
+        <p class="note col">
+          Do documento de planejamento original: 17 palavras em 13 aulas, com as famílias
+          fonêmicas novas de cada uma. Esta é a única fonte que responde <em>em que ordem</em> —
+          e é o currículo-alvo contra o qual o app vai pontuar as palavras que o aluno falar.
+        </p>
+      </div>
+    </div>
+
+    <div class="tscroll col" style="max-width:46rem">
+      <table>
+        <thead>
+          <tr>
+            <th>Aula</th>
+            <th>Palavra geradora</th>
+            <th>Famílias novas</th>
+            <th>O que entra</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="n">1</td><td class="w">BELOTA</td><td class="fam">b, l, t + vogais</td><td>CV simples, consoantes de som único</td></tr>
+          <tr><td class="n">2</td><td class="w">SAPATO</td><td class="fam">s, p</td><td>CV simples</td></tr>
+          <tr><td class="n">3</td><td class="w">VOTO · POVO</td><td class="fam">v</td><td>duas palavras, uma família</td></tr>
+          <tr><td class="n">4</td><td class="w">SALINA</td><td class="fam">n</td><td>CV simples</td></tr>
+          <tr><td class="n">5</td><td class="w">FEIRA</td><td class="fam">f, r <span style="color:var(--text-3)">(ei)</span></td><td>primeiro ditongo</td></tr>
+          <tr><td class="n">6</td><td class="w">MILHO</td><td class="fam">m, lh</td><td>primeiro dígrafo</td></tr>
+          <tr><td class="n">7</td><td class="w">GOLEIRO</td><td class="fam">g</td><td>CV simples</td></tr>
+          <tr class="step"><td class="n">8</td><td class="w">COZINHA · TIJELA</td><td class="fam">c, z, nh, j</td><td><strong>ortografia irregular</strong> — c forte/fraco, ç</td></tr>
+          <tr><td class="n">9</td><td class="w">JARRA · FOGÃO</td><td class="fam">rr, ão</td><td>dígrafo + nasal</td></tr>
+          <tr><td class="n">10</td><td class="w">CHIBANCA</td><td class="fam">ch, an</td><td>dígrafo + sílaba travada</td></tr>
+          <tr><td class="n">11</td><td class="w">XIQUEXIQUE</td><td class="fam">x, que</td><td>sons múltiplos do x</td></tr>
+          <tr class="step"><td class="n">12</td><td class="w">EXPRESSO</td><td class="fam">pr, ss</td><td><strong>encontro consonantal</strong></td></tr>
+          <tr><td class="n">13</td><td class="w">BILRO · ALMOFADA</td><td class="fam">il, d</td><td>sílaba travada em l</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2 col" style="max-width:46rem; margin-top:1.5rem">
+      <div class="stack-s">
+        <h4>A regra da generalização</h4>
+        <p class="note">
+          O documento traz uma nota crítica: ao dar sílabas complexas, o professor introduz outras
+          do mesmo tipo variando só a consoante. <span class="mono">EXPRESSO</span> não ensina apenas
+          <span class="mono">pra pre pri pro pru</span> — ensina <span class="mono">bra dra fra tra vra</span>.
+          No app isso é uma regra de expansão automática de famílias, não conteúdo escrito à mão.
+        </p>
+      </div>
+      <div class="stack-s">
+        <h4>Correção que vale registrar</h4>
+        <p class="note">
+          <span class="mono">TIJOLO</span> é o exemplo canônico do método e a primeira palavra em
+          Recife, Tiriri e Brasília — mas <strong>não foi usada em Angicos</strong>, que começou por
+          <span class="mono">BELOTA</span>. <span class="mono">VOTO</span> é a segunda palavra nas três
+          listas urbanas: alfabetizar era, na letra da lei de então, condição para votar.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5 — translation ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div class="stack-s">
+        <h2>O que vira LLM, o que vira código</h2>
+        <p class="note col">
+          A divisão não é sobre confiança no modelo. É sobre determinismo: onde há regra,
+          código; onde há sentido e ambiguidade, modelo.
+        </p>
+      </div>
+    </div>
+
+    <div class="split col" style="max-width:52rem">
+      <div class="card">
+        <span class="tag b">LLM</span>
+        <h3>Sentido, ambiguidade, diálogo</h3>
+        <ul class="tick">
+          <li><strong>Limpar o ASR pelo contexto.</strong> <span class="mono">“cus cus com ovo”</span> → CUSCUZ. Ataca direto o erro de sotaque.</li>
+          <li><strong>Nota de teor pragmático.</strong> O terceiro critério de Freire. Numa frase sobre despejo, DESPEJO pesa mais que CACHORRO.</li>
+          <li><strong>Conduzir a conversa.</strong> Puxar o campo semântico que traz palavras adequadas ao estágio, sem impor a palavra.</li>
+          <li><strong>Gerar a codificação.</strong> As perguntas de debate para uma palavra que ninguém previu.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="tag a">Código</span>
+        <h3>Estrutura, regra, progressão</h3>
+        <ul class="tick">
+          <li><strong>Silabação.</strong> Regras de pt-BR são regulares. O LLM erra às vezes e você não sabe qual vez.</li>
+          <li><strong>Famílias silábicas.</strong> Consoante × 5 vogais, mais a regra de generalização da aula 12.</li>
+          <li><strong>Validação de palavras.</strong> Wordlist Hunspell pt-BR (VERO) + frequência.</li>
+          <li><strong>Progressão fonética.</strong> Precisa de estado por aluno e de comparação com a grade de Angicos.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 — the algorithm ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div class="stack-s">
+        <h2>Escolher a palavra geradora</h2>
+        <p class="note col">
+          O problema central: a pessoa falou uma frase, e você precisa extrair dela uma palavra que
+          seja ao mesmo tempo carregada de vida <em>e</em> foneticamente adequada ao estágio dela.
+          O LLM propõe candidatos; o código decide.
+        </p>
+      </div>
+    </div>
+
+    <div class="col" style="max-width:48rem">
+      <pre><code>score(palavra) =
+
+  // porteiro — se der 0, a palavra é descartada
+    3.0 · adequacao_fonetica(palavra, estagio)
+
+  // quantas palavras reais as famílias geram
+  + 2.0 · potencia_gerativa(palavra)
+
+  // ideal: 1–2 famílias novas. 0 ou 4+ penaliza
+  + 2.0 · novidade(palavra, dominadas)
+
+  // % de sílabas que ela já domina
+  + 1.5 · reaproveitamento(palavra, dominadas)
+
+  // 0–1, vem do LLM
+  + 1.5 · teor_pragmatico</code></pre>
+
+      <div class="grid-2" style="margin-top:1.75rem">
+        <div class="stack-s">
+          <h4>adequacao_fonetica</h4>
+          <p class="note">
+            Deriva direto da tabela da seção 04. Estágio 1 só aceita CV com consoante de som único
+            (b l t s p v n f m g r). Dígrafos entram no estágio 2, ortografia ambígua (c/g/s/x/ç) no 3,
+            nasais e travadas no 4, encontros consonantais no 5. Uma palavra fora do estágio pontua
+            zero e é descartada, por melhor que seja o resto.
+          </p>
+        </div>
+        <div class="stack-s">
+          <h4>potencia_gerativa</h4>
+          <p class="note">
+            Pré-computável: para cada palavra do dicionário, quantas outras suas famílias silábicas
+            geram. Vira tabela de lookup. É a “riqueza fonêmica” de Freire transformada em número —
+            TIJOLO vale 20, LABUTA valia ~250.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:1.75rem">
+        <p class="note">
+          <strong>Quando nenhum candidato passa.</strong> Não force. A IA faz a próxima pergunta
+          mirando um campo semântico que costuma render palavras do estágio certo — <em>“me conta
+          o que você almoçou”</em> puxa comida, que é cheia de CV simples. A palavra continua vindo
+          da boca da pessoa; o sistema só escolhe onde cutucar. É assim que conversa aberta e
+          currículo controlado convivem sem que nada seja imposto.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7 — what breaks ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <div class="stack-s">
+        <h2>O que não atravessa</h2>
+        <p class="note col">
+          Três coisas do método que um app sozinho não faz. Vale saber quais são para decidir
+          conscientemente, e não descobrir depois.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid col" style="max-width:52rem">
+      <div class="card stack-s">
+        <h3>O grupo</h3>
+        <p class="note">
+          <em>“Quem alfabetiza não é o coordenador: o próprio grupo se alfabetiza pela discussão.”</em>
+          O debate coletivo é o motor. Um app entrega o mecanismo silábico bem e o debate mal — a não
+          ser que você, presencialmente, seja o círculo.
+        </p>
+      </div>
+      <div class="card stack-s">
+        <h3>A fase de conscientização</h3>
+        <p class="note">
+          As dez cenas sobre natureza e cultura, antes de qualquer letra. Sem elas o app funciona,
+          mas vira ferramenta de decodificação — que é exatamente o que Freire dizia que não bastava.
+        </p>
+      </div>
+      <div class="card stack-s">
+        <h3>A imagem local</h3>
+        <p class="note">
+          A codificação precisa ser reconhecível como <em>a minha rua</em>. Em Angicos os alunos
+          criticaram uma salina desenhada com água azul: tinha que ser avermelhada. Banco de imagens
+          e imagem gerada quebram o mecanismo, que depende do reconhecimento.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8 — build order ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">08</span>
+      <div class="stack-s">
+        <h2>Ordem de construção</h2>
+      </div>
+    </div>
+
+    <div class="col" style="max-width:46rem">
+      <ol class="pipe">
+        <li class="hi"><strong>Teste do ASR, 30 minutos.</strong> No celular de um aluno, no ambiente real dele. Cinco frases. Quanto o reconhecimento acerta os substantivos? Esse número destrava ou mata o projeto, e você descobre hoje.</li>
+        <li><strong>Silabador pt-BR.</strong> Determinístico, ~100 linhas. Dígrafos, encontros consonantais, hiatos, ditongos.</li>
+        <li><strong>Gerador de famílias</strong> + regra de generalização da aula 12.</li>
+        <li><strong>Ficha da descoberta interativa</strong> + validação na wordlist. O passo 7 do protocolo: se só isso funcionar, já vale.</li>
+        <li><strong>Loop de áudio.</strong> Web Speech API para ouvir, <code>speechSynthesis</code> para falar, e confirmação sonora obrigatória antes de aceitar a palavra.</li>
+        <li><strong>Proxy do LLM.</strong> ~30 linhas em Cloudflare Worker. A chave nunca no cliente.</li>
+        <li><strong>Escrita</strong> com teclado só das sílabas já aprendidas.</li>
+        <li><strong>Service worker + manifest.</strong> Vira PWA, instala pela tela inicial, funciona sem rede exceto na hora de falar.</li>
+      </ol>
+
+      <div class="callout" style="margin-top:1.75rem">
+        <p class="note">
+          <strong>A métrica do MVP é uma só:</strong> a pessoa volta no dia seguinte. Retenção mata
+          projeto de alfabetização de adulto muito antes de qualidade de silabação. O método antigo
+          resolvia isso com uma regra social simples — não se voltava ao círculo sem ter feito
+          palavras novas em casa. Vale pensar no equivalente.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="col" style="max-width:46rem">
+      <p style="margin-bottom:.75rem">
+        <strong style="color:var(--text-2)">Fontes.</strong>
+        A sequência de nove quadros e as listas de Recife, Tiriri e Brasília vêm de Lauro de Oliveira
+        Lima, <em>Tecnologia, educação e democracia</em> (Civilização Brasileira, 1965, apêndice) —
+        relato de observação direta dos círculos, anterior à descrição do próprio Freire em
+        <em>Educação como Prática da Liberdade</em> (1967). A grade fonética das 13 aulas vem do
+        documento de planejamento original de Angicos, no
+        <a href="https://memorialpaulofreire.ufersa.edu.br/">Memorial Paulo Freire da UFERSA</a>.
+        O relato sobre as imagens e as críticas dos alunos vem de Vicente Vitoriano Marques Carvalho,
+        <em>As imagens no “Método Paulo Freire” na experiência de Angicos</em>
+        (Revista Educação em Questão, UFRN, 2004), a partir dos arquivos de Carlos Lyra.
+      </p>
+      <p>
+        As 20 palavras da ficha interativa foram verificadas contra as famílias T, J e L; as
+        registradas nas fontes de 1965 são <span class="mono">TIJELA · TATU · JUTA · JATI</span>.
+      </p>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var FAMILIES = [
+      ["ta","te","ti","to","tu"],
+      ["ja","je","ji","jo","ju"],
+      ["la","le","li","lo","lu"]
+    ];
+
+    // Palavras reais de pt-BR formáveis com as famílias T, J, L.
+    var LEXICON = [
+      "tatu","tijolo","loja","jato","lata","luta","lote","tela","teto","tato",
+      "tolo","lula","juta","tijela","late","talo","tule","jota","lajota","jati"
+    ];
+
+    var grid  = document.getElementById("grid");
+    var slot  = document.getElementById("slot");
+    var found = document.getElementById("found");
+    var count = document.getElementById("count");
+    var clear = document.getElementById("clear");
+
+    var current = [];
+    var discovered = [];
+
+    FAMILIES.forEach(function (fam) {
+      fam.forEach(function (syl) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "syl";
+        b.textContent = syl;
+        b.addEventListener("click", function () { push(syl); });
+        grid.appendChild(b);
+      });
+    });
+
+    function push(syl) {
+      if (current.length >= 4) current = [];
+      current.push(syl);
+      render();
+    }
+
+    function reset() {
+      current = [];
+      render();
+    }
+
+    clear.addEventListener("click", reset);
+
+    function render() {
+      var word = current.join("");
+
+      if (!word) {
+        slot.className = "word-slot empty";
+        slot.textContent = "toque nas sílabas";
+        return;
+      }
+
+      var isWord = LEXICON.indexOf(word) !== -1;
+      slot.className = "word-slot" + (isWord ? " hit" : "");
+      slot.textContent = word;
+
+      if (isWord && discovered.indexOf(word) === -1) {
+        discovered.push(word);
+        paintFound();
+        setTimeout(reset, 900);
+      }
+    }
+
+    function paintFound() {
+      found.innerHTML = "";
+      discovered.forEach(function (w) {
+        var s = document.createElement("span");
+        s.className = "chip";
+        s.textContent = w;
+        found.appendChild(s);
+      });
+      count.textContent = String(discovered.length);
+    }
+  })();
+</script>

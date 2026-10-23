@@ -1,0 +1,1086 @@
+<title>Manual das ferramentas — app de alfabetização</title>
+
+<style>
+  :root {
+    --ground:   #F2F4F7;
+    --ground-2: #FFFFFF;
+    --ground-3: #E4E8EF;
+    --code-bg:  #131A26;
+    --code-fg:  #C7D3E4;
+    --rule:     #C9D1DE;
+    --text:     #161B24;
+    --text-2:   #4A5464;
+    --text-3:   #6E7889;
+    --ink:      #1B3A6B;
+    --ink-soft: #E3EAF6;
+    --luz:      #A8741A;
+    --luz-soft: #F6EBD5;
+    --ok:       #1F6B4A;
+    --ok-soft:  #DFF0E7;
+    --warn:     #9B3D2E;
+    --warn-soft:#F8E5E1;
+    --shadow:   0 1px 2px rgba(22,27,36,.06), 0 8px 24px -14px rgba(22,27,36,.2);
+
+    --f-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --f-body:    ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+    --f-mono:    ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:   #0E131C;
+      --ground-2: #151C28;
+      --ground-3: #1D2634;
+      --code-bg:  #0A0E15;
+      --code-fg:  #C7D3E4;
+      --rule:     #2C3849;
+      --text:     #E8ECF3;
+      --text-2:   #AEB9C9;
+      --text-3:   #7E8B9D;
+      --ink:      #8CB0EC;
+      --ink-soft: #182740;
+      --luz:      #E0AE55;
+      --luz-soft: #2A2214;
+      --ok:       #6FCFA0;
+      --ok-soft:  #12291F;
+      --warn:     #E89685;
+      --warn-soft:#2B1815;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:#0E131C; --ground-2:#151C28; --ground-3:#1D2634; --code-bg:#0A0E15;
+    --code-fg:#C7D3E4; --rule:#2C3849; --text:#E8ECF3; --text-2:#AEB9C9; --text-3:#7E8B9D;
+    --ink:#8CB0EC; --ink-soft:#182740; --luz:#E0AE55; --luz-soft:#2A2214;
+    --ok:#6FCFA0; --ok-soft:#12291F; --warn:#E89685; --warn-soft:#2B1815;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -16px rgba(0,0,0,.8);
+  }
+
+  :root[data-theme="light"] {
+    --ground:#F2F4F7; --ground-2:#FFFFFF; --ground-3:#E4E8EF; --code-bg:#131A26;
+    --code-fg:#C7D3E4; --rule:#C9D1DE; --text:#161B24; --text-2:#4A5464; --text-3:#6E7889;
+    --ink:#1B3A6B; --ink-soft:#E3EAF6; --luz:#A8741A; --luz-soft:#F6EBD5;
+    --ok:#1F6B4A; --ok-soft:#DFF0E7; --warn:#9B3D2E; --warn-soft:#F8E5E1;
+    --shadow:0 1px 2px rgba(22,27,36,.06), 0 8px 24px -14px rgba(22,27,36,.2);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { overflow-x: hidden; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.62;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap { max-width: 60rem; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.75rem); }
+  .col  { max-width: 36rem; }
+
+  /* Sem isto, um <pre> de linha longa recusa-se a encolher dentro de um
+     grid/flex item (min-width:auto é o default) e estoura a página toda. */
+  .grid-2 > *, .stack > *, .stack-s > *, .stack-l > *,
+  .flow li > *, .traps li > * { min-width: 0; }
+
+  h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.1rem, 5.5vw, 3.3rem); font-weight: 800; letter-spacing: -.035em; line-height: 1.04; }
+  h2 { font-size: clamp(1.45rem, 3vw, 2rem); font-weight: 750; letter-spacing: -.026em; line-height: 1.12; }
+  h3 { font-size: 1.04rem; font-weight: 700; letter-spacing: -.01em; }
+  p  { margin: 0; }
+  a  { color: var(--ink); text-underline-offset: 2px; }
+  strong { font-weight: 700; color: var(--text); }
+
+  .lede { font-size: clamp(1.05rem, 2vw, 1.22rem); line-height: 1.5; color: var(--text-2); }
+  .note { font-size: .93rem; line-height: 1.55; color: var(--text-2); }
+  .mono { font-family: var(--f-mono); }
+
+  .eyebrow {
+    font-family: var(--f-mono); font-size: .69rem; font-weight: 700;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--luz);
+  }
+
+  .stack   { display: flex; flex-direction: column; gap: 1rem; }
+  .stack-s { display: flex; flex-direction: column; gap: .5rem; }
+  .stack-l { display: flex; flex-direction: column; gap: 1.75rem; }
+
+  header { padding-block: clamp(3rem, 8vw, 5.5rem) clamp(1.5rem, 4vw, 2.5rem); }
+
+  .rule-luz { width: 3.2rem; height: 3px; background: var(--luz); margin-bottom: 1.6rem; }
+
+  section { padding-block: clamp(2.75rem, 6vw, 4.5rem); border-top: 1px solid var(--rule); }
+
+  .sec-head { display: flex; gap: 1.1rem; align-items: baseline; margin-bottom: 1.75rem; }
+
+  .sec-num {
+    font-family: var(--f-mono); font-size: .75rem; font-weight: 700;
+    color: var(--luz); letter-spacing: .08em; padding-top: .4em; flex: none;
+  }
+
+  /* code */
+  pre {
+    margin: 0;
+    max-width: 100%;
+    background: var(--code-bg);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.05rem 1.2rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: var(--f-mono);
+    font-size: .775rem;
+    line-height: 1.65;
+    color: var(--code-fg);
+    tab-size: 2;
+  }
+
+  pre code { display: block; width: max-content; min-width: 100%; }
+
+  pre .c { color: #6B7C93; font-style: italic; }
+  pre .k { color: #C99BE8; }
+  pre .s { color: #A8D89A; }
+  pre .f { color: #7FB4F0; }
+  pre .n { color: #E8B87A; }
+
+  p code, li code, td code {
+    font-family: var(--f-mono); font-size: .86em;
+    background: var(--ground-3); padding: .1em .35em; border-radius: 2px; color: var(--text);
+  }
+
+  .code-label {
+    font-family: var(--f-mono); font-size: .66rem; font-weight: 700;
+    letter-spacing: .13em; text-transform: uppercase; color: var(--text-3);
+    margin-bottom: .45rem; display: block;
+  }
+
+  /* cards */
+  .card {
+    background: var(--ground-2); border: 1px solid var(--rule);
+    border-radius: 3px; padding: 1.25rem; box-shadow: var(--shadow);
+  }
+
+  .grid-2 {
+    display: grid; gap: 1.25rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  }
+
+  /* trap list */
+  .traps { display: flex; flex-direction: column; gap: .65rem; margin: 0; padding: 0; list-style: none; }
+
+  .traps li {
+    display: grid; grid-template-columns: auto 1fr; gap: .7rem;
+    font-size: .91rem; line-height: 1.5; color: var(--text-2);
+  }
+
+  .traps li::before {
+    content: "!";
+    font-family: var(--f-mono); font-size: .66rem; font-weight: 700;
+    width: 1.15rem; height: 1.15rem; border-radius: 2px;
+    display: grid; place-items: center; margin-top: .18em;
+    background: var(--warn-soft); color: var(--warn);
+  }
+
+  .traps.good li::before { content: "+"; background: var(--ok-soft); color: var(--ok); }
+
+  /* demo */
+  .demo {
+    background: var(--ground-2); border: 1px solid var(--ink);
+    border-radius: 3px; overflow: hidden; box-shadow: var(--shadow);
+  }
+
+  .demo-bar {
+    display: flex; flex-wrap: wrap; align-items: center;
+    justify-content: space-between; gap: .4rem 1rem;
+    padding: .7rem 1.1rem; background: var(--ink-soft); border-bottom: 1px solid var(--rule);
+  }
+
+  .demo-bar .eyebrow { color: var(--ink); }
+  .demo-body { padding: 1.25rem 1.1rem; }
+
+  .btn {
+    font-family: var(--f-display); font-size: .92rem; font-weight: 650;
+    letter-spacing: -.005em; padding: .7rem 1.1rem;
+    background: var(--ink); color: var(--ground-2);
+    border: 1px solid var(--ink); border-radius: 3px; cursor: pointer;
+  }
+
+  .btn:hover { filter: brightness(1.12); }
+  .btn:focus-visible { outline: 2px solid var(--luz); outline-offset: 2px; }
+  .btn[disabled] { opacity: .45; cursor: not-allowed; }
+  .btn.ghost { background: transparent; color: var(--ink); }
+  .btn.rec { background: var(--warn); border-color: var(--warn); color: #fff; }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+
+  .readout {
+    font-family: var(--f-mono); font-size: .8rem; line-height: 1.6;
+    background: var(--ground); border: 1px solid var(--rule); border-radius: 3px;
+    padding: .8rem .9rem; margin-top: 1rem; min-height: 3.5rem;
+    color: var(--text-2); word-break: break-word;
+  }
+
+  .readout .big { font-size: 1.15rem; font-weight: 700; color: var(--text); letter-spacing: .02em; }
+  .readout .dim { color: var(--text-3); }
+  .readout .hl  { color: var(--luz); font-weight: 700; }
+  .readout .good{ color: var(--ok); font-weight: 700; }
+
+  .alts { display: flex; flex-direction: column; gap: .3rem; margin-top: .7rem; }
+
+  .alt {
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: .15rem .8rem;
+    font-family: var(--f-mono); font-size: .76rem;
+    padding: .35rem .55rem; background: var(--ground-3); border-radius: 2px;
+    word-break: break-word;
+  }
+
+  .alt:first-child { background: var(--luz-soft); color: var(--luz); font-weight: 700; }
+
+  .field {
+    width: 100%; font-family: var(--f-body); font-size: .95rem;
+    padding: .6rem .7rem; background: var(--ground); color: var(--text);
+    border: 1px solid var(--rule); border-radius: 3px; margin-bottom: .7rem;
+  }
+
+  .field:focus-visible { outline: 2px solid var(--luz); outline-offset: 1px; }
+
+  .slider-row { display: flex; align-items: center; gap: .7rem; margin-bottom: .7rem; font-size: .82rem; color: var(--text-2); }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--ink); }
+  .slider-row .val { font-family: var(--f-mono); font-size: .76rem; color: var(--luz); font-weight: 700; min-width: 2.2rem; }
+
+  /* flow */
+  .flow { display: flex; flex-direction: column; gap: .45rem; margin: 0; padding: 0; list-style: none; counter-reset: fl; }
+
+  .flow li {
+    counter-increment: fl;
+    display: grid; grid-template-columns: 1.9rem 1fr; gap: 0 .85rem;
+    background: var(--ground-2); border: 1px solid var(--rule); border-radius: 3px;
+    padding: .7rem .9rem; font-size: .92rem; line-height: 1.5; color: var(--text-2);
+  }
+
+  .flow li::before {
+    content: counter(fl, decimal-leading-zero);
+    font-family: var(--f-mono); font-size: .7rem; font-weight: 700;
+    color: var(--text-3); padding-top: .2em;
+  }
+
+  .callout {
+    border-left: 3px solid var(--luz); background: var(--luz-soft);
+    padding: 1rem 1.25rem; border-radius: 0 3px 3px 0;
+  }
+
+  table { border-collapse: collapse; width: 100%; font-size: .87rem; }
+  .tscroll {
+    max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--rule); border-radius: 3px; background: var(--ground-2);
+  }
+  th, td { text-align: left; padding: .55rem .8rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  thead th {
+    font-family: var(--f-mono); font-size: .66rem; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--text-3); background: var(--ground-3); white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.mono-c { font-family: var(--f-mono); font-size: .8rem; color: var(--ink); white-space: nowrap; }
+
+  footer { padding-block: 2.5rem 4rem; border-top: 1px solid var(--rule); font-size: .88rem; color: var(--text-3); }
+
+  /* ---------- telas estreitas ---------- */
+  @media (max-width: 40rem) {
+    body { font-size: 16px; }
+
+    pre { font-size: .69rem; padding: .8rem .85rem; line-height: 1.6; }
+
+    .sec-head { gap: .7rem; margin-bottom: 1.4rem; }
+    .grid-2 { gap: 1.5rem; }
+
+    /* os max-width inline das seções passam da viewport em telas pequenas */
+    .col, .demo, .callout, .tscroll, .flow, .grid-2 { max-width: 100% !important; }
+
+    .btn { width: 100%; text-align: center; }
+    .btn-row { gap: .5rem; }
+    .btn-row .note { text-align: center; width: 100%; }
+
+    .slider-row { flex-wrap: wrap; }
+    .slider-row label { min-width: 0 !important; }
+    .slider-row input[type=range] { flex: 1 1 60%; }
+
+    .traps li { gap: .55rem; }
+    .flow li { grid-template-columns: 1.6rem 1fr; gap: 0 .6rem; padding: .65rem .75rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="rule-luz"></div>
+  <div class="stack-l col" style="max-width:42rem">
+    <div class="stack">
+      <span class="eyebrow">Manual das ferramentas</span>
+      <h1>Como cada peça funciona por dentro</h1>
+    </div>
+    <p class="lede">
+      Sete ferramentas, uma seção cada: o que é, a mecânica, o código mínimo que funciona,
+      e o que dá errado. As duas primeiras rodam aqui na página — <strong>abra no celular
+      e teste</strong>, que é literalmente o passo 1 do plano.
+    </p>
+  </div>
+</header>
+
+<!-- ============================================ 1 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <div class="stack-s">
+      <h2>Web Speech API — ouvir</h2>
+      <p class="note col">
+        Reconhecimento de fala embutido no Chrome. Você não instala nada, não paga nada e não
+        gerencia modelo: o navegador captura o áudio, manda para o serviço de reconhecimento do
+        Google e devolve texto. É o mesmo motor das legendas automáticas do YouTube.
+      </p>
+    </div>
+  </div>
+
+  <div class="demo col" style="max-width:38rem">
+    <div class="demo-bar">
+      <span class="eyebrow">Teste ao vivo</span>
+      <span class="mono" style="font-size:.72rem;color:var(--text-3)" id="asr-support">verificando…</span>
+    </div>
+    <div class="demo-body">
+      <div class="btn-row">
+        <button class="btn" id="asr-btn" type="button">Segure para falar</button>
+        <span class="note" style="font-size:.84rem">Fale uma frase do dia a dia</span>
+      </div>
+      <div class="readout" id="asr-out">
+        <span class="dim">O que o reconhecimento entender aparece aqui, com as alternativas e a confiança.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2 col" style="max-width:52rem; margin-top:1.75rem">
+    <div class="stack">
+      <div>
+        <span class="code-label">O código inteiro</span>
+        <pre><code><span class="k">const</span> SR = window.SpeechRecognition
+        || window.webkitSpeechRecognition;
+
+<span class="k">const</span> rec = <span class="k">new</span> <span class="f">SR</span>();
+rec.lang = <span class="s">'pt-BR'</span>;
+rec.continuous = <span class="k">false</span>;     <span class="c">// para no fim da frase</span>
+rec.interimResults = <span class="k">true</span>;  <span class="c">// texto parcial</span>
+rec.maxAlternatives = <span class="n">3</span>;     <span class="c">// 3 palpites, não 1</span>
+
+rec.<span class="f">onresult</span> = (e) => {
+  <span class="k">const</span> rs = e.results;
+  <span class="k">const</span> r = rs[rs.length - <span class="n">1</span>];
+
+  <span class="k">const</span> texto = r[<span class="n">0</span>].transcript;
+  <span class="k">const</span> conf  = r[<span class="n">0</span>].confidence;  <span class="c">// 0 a 1</span>
+
+  <span class="k">if</span> (r.isFinal) <span class="f">processar</span>(texto, conf);
+};
+
+rec.<span class="f">onerror</span> = (e) => <span class="f">tratar</span>(e.error);
+rec.<span class="f">onend</span>   = ()  => <span class="f">resetarBotao</span>();
+
+rec.<span class="f">start</span>();</code></pre>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="stack-s">
+        <h3>O que dá errado</h3>
+        <ul class="traps">
+          <li>Só funciona em <strong>HTTPS</strong> ou <code>localhost</code>. Em HTTP o objeto existe mas nunca dispara resultado.</li>
+          <li>Precisa de rede. É reconhecimento no servidor, não no aparelho — sem internet, não ouve.</li>
+          <li><code>continuous: true</code> é instável no Android: para sozinho depois de alguns segundos. Use <code>false</code> e uma gravação por vez.</li>
+          <li>Firefox não suporta. Safari só a partir do iOS 14.5, com prefixo.</li>
+          <li>O áudio vai para servidores do Google. Para um público que vai falar da própria vida, isso precisa estar no seu aviso de privacidade.</li>
+          <li><code>onend</code> dispara sempre — inclusive depois de erro. É onde você reseta a interface, não no <code>onresult</code>.</li>
+        </ul>
+      </div>
+
+      <div class="stack-s" style="margin-top:.5rem">
+        <h3>O truque que vale ouro aqui</h3>
+        <ul class="traps good">
+          <li><code>maxAlternatives = 3</code> devolve os três melhores palpites. Mande os três para o Claude e deixe ele escolher qual faz sentido na frase — <em>“cus cus”</em>, <em>“cuscuz”</em>, <em>“cuz cuz”</em> viram CUSCUZ. É a defesa mais barata que existe contra erro de sotaque.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ 2 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <div class="stack-s">
+      <h2>speechSynthesis — falar</h2>
+      <p class="note col">
+        A síntese de voz do sistema. Diferente do reconhecimento, roda <strong>inteiramente no
+        aparelho</strong>: funciona offline, é instantânea e não manda nada para lugar nenhum.
+        Toda a interface falada do app sai daqui.
+      </p>
+    </div>
+  </div>
+
+  <div class="demo col" style="max-width:38rem">
+    <div class="demo-bar">
+      <span class="eyebrow">Teste ao vivo</span>
+      <span class="mono" style="font-size:.72rem;color:var(--text-3)" id="tts-voices">…</span>
+    </div>
+    <div class="demo-body">
+      <input class="field" id="tts-text" type="text" value="Me conta o que você comeu hoje" aria-label="Texto para falar">
+      <div class="slider-row">
+        <label for="tts-rate" style="min-width:5.2rem">Velocidade</label>
+        <input type="range" id="tts-rate" min="0.5" max="1.4" step="0.05" value="0.9">
+        <span class="val" id="tts-rate-v">0.90</span>
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="tts-btn" type="button">Falar</button>
+        <button class="btn ghost" id="tts-stop" type="button">Parar</button>
+      </div>
+      <div class="readout" id="tts-out">
+        <span class="dim">Ajuste a velocidade para 0.85–0.95 — adulto em alfabetização precisa de tempo para acompanhar.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2 col" style="max-width:52rem; margin-top:1.75rem">
+    <div>
+      <span class="code-label">O código inteiro</span>
+      <pre><code><span class="k">function</span> <span class="f">falar</span>(texto) {
+  speechSynthesis.<span class="f">cancel</span>();  <span class="c">// senão enfileira</span>
+
+  <span class="k">const</span> u = <span class="k">new</span> <span class="f">SpeechSynthesisUtterance</span>(texto);
+  u.lang   = <span class="s">'pt-BR'</span>;
+  u.rate   = <span class="n">0.9</span>;   <span class="c">// mais devagar que o padrão</span>
+  u.pitch  = <span class="n">1</span>;
+  u.volume = <span class="n">1</span>;
+
+  <span class="c">// escolhe uma voz pt-BR se houver</span>
+  <span class="k">const</span> v = speechSynthesis.<span class="f">getVoices</span>()
+    .<span class="f">find</span>(v => v.lang.<span class="f">startsWith</span>(<span class="s">'pt'</span>));
+  <span class="k">if</span> (v) u.voice = v;
+
+  u.<span class="f">onend</span> = () => <span class="f">liberarBotaoDeFalar</span>();
+  speechSynthesis.<span class="f">speak</span>(u);
+}</code></pre>
+    </div>
+
+    <div class="stack-s">
+      <h3>O que dá errado</h3>
+      <ul class="traps">
+        <li><code>getVoices()</code> volta <strong>vazio na primeira chamada</strong>. As vozes carregam de forma assíncrona — espere o evento <code>voiceschanged</code> antes de escolher.</li>
+        <li>iOS exige um toque do usuário antes do primeiro <code>speak()</code>. Um áudio automático ao abrir a página simplesmente não sai.</li>
+        <li>Sem <code>cancel()</code> antes, as falas <strong>empilham</strong> e a pessoa ouve tudo em sequência.</li>
+        <li>A qualidade da voz varia por aparelho. Android barato costuma ter voz pt-BR robótica, mas inteligível — teste no aparelho real, não no seu.</li>
+        <li>No Chrome desktop a fala corta perto dos 15 segundos. Frases curtas resolvem, e no app elas já são curtas.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout col" style="max-width:52rem; margin-top:1.5rem">
+    <p class="note">
+      <strong>A economia escondida.</strong> Como a síntese é local e gratuita, você pode falar
+      <em>tudo</em>: cada botão, cada instrução, cada erro. Isso é o que torna o app usável por
+      quem não lê — e é justamente o que seria proibitivo se você pagasse por caractere sintetizado.
+    </p>
+  </div>
+</section>
+
+<!-- ============================================ 3 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <div class="stack-s">
+      <h2>PWA — virar app sem loja</h2>
+      <p class="note col">
+        Um PWA é o seu site mais dois arquivos. Com eles o Chrome oferece “adicionar à tela inicial”,
+        e a partir daí o site abre em janela própria, com ícone, sem barra de endereço — indistinguível
+        de um app instalado, para quem usa.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid-2 col" style="max-width:52rem">
+    <div>
+      <span class="code-label">manifest.json</span>
+      <pre><code>{
+  <span class="s">"name"</span>: <span class="s">"Palavra"</span>,
+  <span class="s">"short_name"</span>: <span class="s">"Palavra"</span>,
+  <span class="s">"start_url"</span>: <span class="s">"/"</span>,
+  <span class="s">"display"</span>: <span class="s">"standalone"</span>,
+  <span class="s">"background_color"</span>: <span class="s">"#0E131C"</span>,
+  <span class="s">"theme_color"</span>: <span class="s">"#1B3A6B"</span>,
+  <span class="s">"icons"</span>: [
+    { <span class="s">"src"</span>: <span class="s">"/icon-192.png"</span>,
+      <span class="s">"sizes"</span>: <span class="s">"192x192"</span>,
+      <span class="s">"type"</span>: <span class="s">"image/png"</span> },
+    { <span class="s">"src"</span>: <span class="s">"/icon-512.png"</span>,
+      <span class="s">"sizes"</span>: <span class="s">"512x512"</span>,
+      <span class="s">"type"</span>: <span class="s">"image/png"</span> }
+  ]
+}</code></pre>
+      <div style="margin-top:1rem">
+        <span class="code-label">no index.html</span>
+        <pre><code>&lt;<span class="k">link</span> <span class="f">rel</span>=<span class="s">"manifest"</span> <span class="f">href</span>=<span class="s">"/manifest.json"</span>&gt;
+&lt;<span class="k">meta</span> <span class="f">name</span>=<span class="s">"theme-color"</span> <span class="f">content</span>=<span class="s">"#1B3A6B"</span>&gt;
+&lt;<span class="k">meta</span> <span class="f">name</span>=<span class="s">"viewport"</span>
+      <span class="f">content</span>=<span class="s">"width=device-width,initial-scale=1"</span>&gt;</code></pre>
+      </div>
+    </div>
+
+    <div class="stack-s">
+      <h3>O que o Chrome exige para oferecer a instalação</h3>
+      <ul class="traps good">
+        <li>Servido por HTTPS</li>
+        <li>Manifesto válido com <code>name</code>, <code>start_url</code>, <code>display</code> e ícones de 192px e 512px</li>
+        <li>Um service worker registrado que trate o evento <code>fetch</code></li>
+      </ul>
+
+      <h3 style="margin-top:.75rem">O que dá errado</h3>
+      <ul class="traps">
+        <li>Sem os dois tamanhos de ícone, o prompt de instalação não aparece — e não há mensagem de erro dizendo isso.</li>
+        <li>O usuário do seu público não vai achar “adicionar à tela inicial” sozinho no menu. Faça um botão na tela que dispare o evento <code>beforeinstallprompt</code> capturado, com áudio explicando.</li>
+        <li>No iOS a instalação é manual pelo Safari (Compartilhar → Adicionar à Tela de Início) e o service worker tem limites. Se seu público é Android, ignore; se não, teste.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ 4 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <div class="stack-s">
+      <h2>Service worker — funcionar sem internet</h2>
+      <p class="note col">
+        É um script que roda numa thread separada e fica <strong>entre a sua página e a rede</strong>,
+        como um proxy que você programa. Toda requisição passa por ele, e ele decide: devolvo do
+        cache, busco na rede, ou tento a rede e caio no cache se falhar.
+      </p>
+    </div>
+  </div>
+
+  <div class="col" style="max-width:52rem">
+    <ol class="flow" style="margin-bottom:1.5rem">
+      <li><strong>install</strong> — dispara uma vez, na primeira visita. É onde você baixa e guarda os arquivos do app.</li>
+      <li><strong>activate</strong> — assume o controle. É onde você apaga caches de versões antigas.</li>
+      <li><strong>fetch</strong> — dispara em <em>toda</em> requisição, para sempre. É onde mora a estratégia de cache.</li>
+    </ol>
+
+    <div class="grid-2">
+      <div>
+        <span class="code-label">sw.js</span>
+        <pre><code><span class="k">const</span> CACHE = <span class="s">'palavra-v1'</span>;
+<span class="k">const</span> ASSETS = [
+  <span class="s">'/'</span>, <span class="s">'/index.html'</span>, <span class="s">'/app.js'</span>,
+  <span class="s">'/estilo.css'</span>, <span class="s">'/wordlist.json'</span>
+];
+
+self.<span class="f">addEventListener</span>(<span class="s">'install'</span>, e => {
+  e.<span class="f">waitUntil</span>(
+    caches.<span class="f">open</span>(CACHE).<span class="f">then</span>(c => c.<span class="f">addAll</span>(ASSETS))
+  );
+  self.<span class="f">skipWaiting</span>();
+});
+
+self.<span class="f">addEventListener</span>(<span class="s">'activate'</span>, e => {
+  e.<span class="f">waitUntil</span>(
+    caches.<span class="f">keys</span>().<span class="f">then</span>(ks => <span class="f">Promise</span>.<span class="f">all</span>(
+      ks.<span class="f">filter</span>(k => k !== CACHE)
+        .<span class="f">map</span>(k => caches.<span class="f">delete</span>(k))
+    ))
+  );
+  self.clients.<span class="f">claim</span>();
+});
+
+self.<span class="f">addEventListener</span>(<span class="s">'fetch'</span>, e => {
+  <span class="c">// nunca cacheie a chamada ao LLM</span>
+  <span class="k">if</span> (e.request.url.<span class="f">includes</span>(<span class="s">'/api/'</span>)) <span class="k">return</span>;
+
+  e.<span class="f">respondWith</span>(
+    caches.<span class="f">match</span>(e.request)
+      .<span class="f">then</span>(r => r || <span class="f">fetch</span>(e.request))
+  );
+});</code></pre>
+      </div>
+
+      <div class="stack-s">
+        <div>
+          <span class="code-label">registro, no app.js</span>
+          <pre><code><span class="k">if</span> (<span class="s">'serviceWorker'</span> <span class="k">in</span> navigator) {
+  navigator.serviceWorker.<span class="f">register</span>(<span class="s">'/sw.js'</span>);
+}</code></pre>
+        </div>
+
+        <h3 style="margin-top:.5rem">O que dá errado</h3>
+        <ul class="traps">
+          <li>Sem <code>skipWaiting()</code> + <code>clients.claim()</code>, a versão antiga continua no comando até <strong>todas</strong> as abas fecharem. Você publica a correção e jura que não subiu.</li>
+          <li>Cache API não é <code>localStorage</code>. São dois armazenamentos diferentes, com APIs diferentes.</li>
+          <li>Cachear a chamada da API do LLM devolve a resposta da sessão anterior. Exclua a rota <code>/api/</code> explicitamente.</li>
+          <li>Trocar o nome do cache (<code>v1</code> → <code>v2</code>) é o que força a atualização. Sem isso, os arquivos velhos ficam.</li>
+          <li>O service worker não enxerga o DOM. Ele é rede e cache, mais nada.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ 5 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <div class="stack-s">
+      <h2>localStorage — guardar o progresso</h2>
+      <p class="note col">
+        Um dicionário de texto que sobrevive ao fechar o app, dentro do próprio celular.
+        Para o seu caso substitui banco de dados, login e servidor inteiros.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid-2 col" style="max-width:52rem">
+    <div>
+      <span class="code-label">o estado do aluno inteiro</span>
+      <pre><code><span class="k">const</span> CHAVE = <span class="s">'palavra.aluno'</span>;
+
+<span class="k">const</span> vazio = {
+  familias: {},     <span class="c">// { t: 0.9, l: 0.7, j: 0.3 }</span>
+  palavras: [],     <span class="c">// geradoras já trabalhadas</span>
+  descobertas: [],  <span class="c">// palavras que ela formou</span>
+  sessoes: <span class="n">0</span>,
+  estagio: <span class="n">1</span>         <span class="c">// 1 a 5, a grade fonética</span>
+};
+
+<span class="k">function</span> <span class="f">carregar</span>() {
+  <span class="k">try</span> {
+    <span class="k">const</span> cru = localStorage.<span class="f">getItem</span>(CHAVE);
+    <span class="k">return</span> { ...vazio, ...<span class="f">JSON</span>.<span class="f">parse</span>(cru || <span class="s">'{}'</span>) };
+  } <span class="k">catch</span> {
+    <span class="k">return</span> { ...vazio };  <span class="c">// JSON corrompido</span>
+  }
+}
+
+<span class="k">function</span> <span class="f">salvar</span>(estado) {
+  localStorage.<span class="f">setItem</span>(CHAVE, <span class="f">JSON</span>.<span class="f">stringify</span>(estado));
+}</code></pre>
+    </div>
+
+    <div class="stack-s">
+      <h3>O que dá errado</h3>
+      <ul class="traps">
+        <li>Guarda <strong>só texto</strong>. Objeto tem que passar por <code>JSON.stringify</code> na ida e <code>JSON.parse</code> na volta — e o parse precisa de <code>try/catch</code>, senão um dado corrompido derruba o app na abertura.</li>
+        <li>Se a pessoa limpar os dados do site, o progresso vai junto. Para um protótipo é aceitável; quando doer, sincronize com um Supabase.</li>
+        <li>É síncrono, então trava a thread enquanto escreve. Com um objeto pequeno como esse, irrelevante.</li>
+        <li>É por origem e por navegador. Trocar de celular começa do zero.</li>
+      </ul>
+
+      <div class="callout" style="margin-top:.5rem">
+        <p class="note">
+          Note o <code>{ ...vazio, ...salvo }</code>: quando você adicionar um campo novo ao estado
+          numa versão futura, os alunos que já têm dado salvo recebem o valor padrão em vez de
+          <code>undefined</code>. É uma linha que evita uma classe inteira de bug.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ 6 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <div class="stack-s">
+      <h2>Cloudflare Worker — o proxy da chave</h2>
+      <p class="note col">
+        Qualquer pessoa lê o código-fonte do seu app. Se a chave da API estiver lá, ela é copiada
+        e a conta é sua. O Worker é uma função que roda no servidor, guarda a chave e repassa a
+        chamada — a única parte do sistema que não vive no celular.
+      </p>
+    </div>
+  </div>
+
+  <div class="grid-2 col" style="max-width:52rem">
+    <div>
+      <span class="code-label">worker.js — completo</span>
+      <pre><code><span class="k">const</span> API = <span class="s">'https://api.anthropic.com/v1/messages'</span>;
+<span class="k">const</span> APP = <span class="s">'https://seu-app.pages.dev'</span>;
+
+<span class="k">const</span> cors = {
+  <span class="s">'Access-Control-Allow-Origin'</span>: APP,
+  <span class="s">'Access-Control-Allow-Headers'</span>: <span class="s">'content-type'</span>
+};
+
+<span class="k">export default</span> {
+  <span class="k">async</span> <span class="f">fetch</span>(req, env) {
+
+    <span class="c">// sondagem que o navegador manda antes do POST</span>
+    <span class="k">if</span> (req.method === <span class="s">'OPTIONS'</span>)
+      <span class="k">return new</span> <span class="f">Response</span>(<span class="k">null</span>, { headers: cors });
+
+    <span class="k">if</span> (req.method !== <span class="s">'POST'</span>)
+      <span class="k">return new</span> <span class="f">Response</span>(<span class="s">'só POST'</span>, { status: <span class="n">405</span> });
+
+    <span class="k">const</span> { fala, estado } = <span class="k">await</span> req.<span class="f">json</span>();
+
+    <span class="k">const</span> r = <span class="k">await</span> <span class="f">fetch</span>(API, {
+      method: <span class="s">'POST'</span>,
+      headers: {
+        <span class="s">'content-type'</span>: <span class="s">'application/json'</span>,
+        <span class="s">'x-api-key'</span>: env.ANTHROPIC_API_KEY,
+        <span class="s">'anthropic-version'</span>: <span class="s">'2023-06-01'</span>
+      },
+      body: <span class="f">JSON</span>.<span class="f">stringify</span>({
+        model: <span class="s">'claude-sonnet-5'</span>,
+        max_tokens: <span class="n">2000</span>,
+        system: [{
+          type: <span class="s">'text'</span>,
+          text: PROMPT_FREIRIANO,
+          cache_control: { type: <span class="s">'ephemeral'</span> }
+        }],
+        output_config: {
+          format: {
+            type: <span class="s">'json_schema'</span>,
+            schema: SCHEMA
+          }
+        },
+        messages: [{
+          role: <span class="s">'user'</span>,
+          content: <span class="s">`Fala: ${fala}\nEstado: ${estado}`</span>
+        }]
+      })
+    });
+
+    <span class="k">return new</span> <span class="f">Response</span>(r.body, {
+      headers: {
+        ...cors,
+        <span class="s">'content-type'</span>: <span class="s">'application/json'</span>
+      }
+    });
+  }
+};</code></pre>
+    </div>
+
+    <div class="stack-s">
+      <div>
+        <span class="code-label">publicar</span>
+        <pre><code>npm i -g wrangler
+wrangler login
+wrangler secret put ANTHROPIC_API_KEY
+wrangler deploy</code></pre>
+      </div>
+
+      <h3 style="margin-top:.5rem">O que dá errado</h3>
+      <ul class="traps">
+        <li>Sem os cabeçalhos de CORS, o navegador bloqueia a resposta e o erro no console não diz que o problema é CORS de forma óbvia.</li>
+        <li>Esquecer o <code>OPTIONS</code>: o navegador manda uma requisição de sondagem antes do POST, e se ela falhar o POST nem sai.</li>
+        <li><code>Access-Control-Allow-Origin: *</code> deixa qualquer site usar seu Worker — e sua cota. Fixe no domínio do seu app.</li>
+        <li>A chave vai por <code>wrangler secret</code>, nunca no código nem no <code>wrangler.toml</code>.</li>
+        <li>Free tier: 100 mil requisições por dia. Com 20 alunos você usa 400 por <em>mês</em>.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ 7 -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <div class="stack-s">
+      <h2>A chamada ao Claude</h2>
+      <p class="note col">
+        Três recursos fazem o trabalho pesado aqui: saída estruturada para você receber objeto
+        em vez de texto, cache de prompt para o custo não escalar com o tamanho das instruções,
+        e uma única chamada por turno resolvendo tudo.
+      </p>
+    </div>
+  </div>
+
+  <div class="col" style="max-width:52rem">
+    <div class="grid-2">
+      <div>
+        <span class="code-label">o schema — o contrato da resposta</span>
+        <pre><code><span class="k">const</span> SCHEMA = {
+  type: <span class="s">'object'</span>,
+  properties: {
+    transcricao_corrigida: { type: <span class="s">'string'</span> },
+    palavra_geradora:      { type: <span class="s">'string'</span> },
+    por_que_essa:          { type: <span class="s">'string'</span> },
+    carga_existencial:     { type: <span class="s">'number'</span> },
+    perguntas_debate: {
+      type: <span class="s">'array'</span>,
+      items: { type: <span class="s">'string'</span> }
+    },
+    proxima_pergunta:      { type: <span class="s">'string'</span> }
+  },
+  required: [
+    <span class="s">'transcricao_corrigida'</span>, <span class="s">'palavra_geradora'</span>,
+    <span class="s">'por_que_essa'</span>, <span class="s">'carga_existencial'</span>,
+    <span class="s">'perguntas_debate'</span>, <span class="s">'proxima_pergunta'</span>
+  ],
+  additionalProperties: <span class="k">false</span>
+};</code></pre>
+      </div>
+
+      <div class="stack-s">
+        <h3>Por que cada peça está aí</h3>
+        <div class="tscroll">
+          <table>
+            <thead>
+              <tr><th>Recurso</th><th>O que resolve</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="mono-c">output_config<br>.format</td>
+                <td>Você recebe JSON validado contra o schema. Sem regex, sem “às vezes ele responde com markdown em volta”.</td>
+              </tr>
+              <tr>
+                <td class="mono-c">cache_control</td>
+                <td>Seu prompt pedagógico pode ter 3 mil tokens explicando o método. Cacheado, custa 10% a partir da segunda chamada.</td>
+              </tr>
+              <tr>
+                <td class="mono-c">max_tokens</td>
+                <td>Teto rígido da resposta. Se estourar, vem cortada — deixe folga.</td>
+              </tr>
+              <tr>
+                <td class="mono-c">additional<br>Properties</td>
+                <td>Precisa ser <code>false</code>, e todo campo listado em <code>required</code>. É exigência do schema estrito.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:1.5rem">
+      <p class="note">
+        <strong>Uma chamada por turno, não quatro.</strong> Corrigir a transcrição, escolher a palavra,
+        justificar a escolha, gerar as perguntas de debate e formular a próxima pergunta são cinco
+        tarefas — mas cabem num pedido só, porque todas olham para a mesma frase. Cinco chamadas
+        custariam cinco vezes mais e demorariam cinco vezes mais, sem ficar melhores.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================ how they connect -->
+<section>
+  <div class="sec-head">
+    <span class="sec-num">08</span>
+    <div class="stack-s">
+      <h2>As sete peças em um turno</h2>
+      <p class="note col">
+        Onde cada ferramenta entra, do momento em que a pessoa abre o app até ela descobrir
+        uma palavra nova.
+      </p>
+    </div>
+  </div>
+
+  <ol class="flow col" style="max-width:44rem">
+    <li><strong>Service worker</strong> serve o app do cache — abre instantâneo, mesmo com wifi ruim.</li>
+    <li><strong>localStorage</strong> devolve o estado: quais famílias silábicas ela já domina.</li>
+    <li><strong>speechSynthesis</strong> faz a pergunta em voz alta.</li>
+    <li><strong>Web Speech API</strong> ouve a resposta e devolve 3 alternativas com confiança.</li>
+    <li><strong>Cloudflare Worker</strong> recebe as alternativas + o estado e chama o Claude com a chave protegida.</li>
+    <li><strong>Claude</strong> devolve JSON: transcrição corrigida, palavra geradora, perguntas de debate.</li>
+    <li><strong>speechSynthesis</strong> confirma em voz: <em>“ouvi CUSCUZ, tá certo?”</em> — e só prossegue com o sim.</li>
+    <li><strong>Seu código</strong> silabifica, gera as famílias, monta a ficha da descoberta.</li>
+    <li><strong>localStorage</strong> grava o que mudou. Fim do turno.</li>
+  </ol>
+
+  <div class="callout col" style="max-width:44rem; margin-top:1.5rem">
+    <p class="note">
+      Só o passo 5 custa dinheiro e só os passos 4 e 5 precisam de internet. Todo o resto
+      funciona com o celular no modo avião — inclusive a ficha da descoberta, que é onde a
+      pessoa passa a maior parte do tempo.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="col" style="max-width:44rem">
+    <p>
+      As demos de reconhecimento e síntese usam as APIs reais do seu navegador, sem nenhuma
+      biblioteca. Se funcionarem no celular do aluno, funcionam no app — é exatamente o mesmo
+      código que está mostrado aqui.
+    </p>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- 01 · reconhecimento ---------------- */
+
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var asrBtn = document.getElementById("asr-btn");
+  var asrOut = document.getElementById("asr-out");
+  var asrSup = document.getElementById("asr-support");
+  var rec = null, ouvindo = false;
+
+  if (!SR) {
+    asrSup.textContent = "não suportado neste navegador";
+    asrBtn.disabled = true;
+    asrOut.innerHTML = '<span class="dim">Este navegador não tem a Web Speech API. ' +
+                       'Abra no Chrome (Android ou desktop) para testar.</span>';
+  } else {
+    asrSup.textContent = "disponível";
+
+    rec = new SR();
+    rec.lang = "pt-BR";
+    rec.continuous = false;
+    rec.interimResults = true;
+    rec.maxAlternatives = 3;
+
+    rec.onresult = function (e) {
+      var r = e.results[e.results.length - 1];
+
+      if (!r.isFinal) {
+        asrOut.innerHTML = '<span class="dim">ouvindo…</span><br>' +
+                           '<span class="big">' + esc(r[0].transcript) + "</span>";
+        return;
+      }
+
+      var conf = typeof r[0].confidence === "number" ? r[0].confidence : null;
+      var html = '<span class="big">' + esc(r[0].transcript) + "</span><br>" +
+                 '<span class="dim">confiança: </span>' +
+                 (conf === null
+                   ? '<span class="dim">não informada</span>'
+                   : '<span class="' + (conf > 0.8 ? "good" : "hl") + '">' +
+                     (conf * 100).toFixed(0) + "%</span>");
+
+      if (r.length > 1) {
+        html += '<div class="alts">';
+        for (var i = 0; i < r.length; i++) {
+          html += '<div class="alt"><span>' + esc(r[i].transcript) + "</span>" +
+                  "<span>" + (i === 0 ? "1º palpite" : "alternativa " + (i + 1)) + "</span></div>";
+        }
+        html += "</div>";
+        html += '<div style="margin-top:.6rem" class="dim">' +
+                "As " + r.length + " alternativas iriam para o Claude escolher qual faz sentido." +
+                "</div>";
+      }
+
+      asrOut.innerHTML = html;
+    };
+
+    rec.onerror = function (e) {
+      var msgs = {
+        "no-speech": "Não ouvi nada. Fale mais perto do microfone.",
+        "not-allowed": "Permissão de microfone negada. Libere nas configurações do site.",
+        "audio-capture": "Nenhum microfone encontrado.",
+        "network": "Sem rede — o reconhecimento precisa de internet.",
+        "aborted": "Gravação interrompida."
+      };
+      asrOut.innerHTML = '<span class="hl">' +
+                         esc(msgs[e.error] || ("Erro: " + e.error)) + "</span>";
+    };
+
+    rec.onend = function () {
+      ouvindo = false;
+      asrBtn.textContent = "Segure para falar";
+      asrBtn.classList.remove("rec");
+    };
+
+    asrBtn.addEventListener("click", function () {
+      if (ouvindo) { rec.stop(); return; }
+      try {
+        asrOut.innerHTML = '<span class="dim">pode falar…</span>';
+        rec.start();
+        ouvindo = true;
+        asrBtn.textContent = "Ouvindo — toque para parar";
+        asrBtn.classList.add("rec");
+      } catch (err) {
+        asrOut.innerHTML = '<span class="hl">' + esc(String(err.message || err)) + "</span>";
+      }
+    });
+  }
+
+  /* ---------------- 02 · síntese ---------------- */
+
+  var ttsBtn  = document.getElementById("tts-btn");
+  var ttsStop = document.getElementById("tts-stop");
+  var ttsText = document.getElementById("tts-text");
+  var ttsRate = document.getElementById("tts-rate");
+  var ttsRateV= document.getElementById("tts-rate-v");
+  var ttsOut  = document.getElementById("tts-out");
+  var ttsVox  = document.getElementById("tts-voices");
+
+  ttsRate.addEventListener("input", function () {
+    ttsRateV.textContent = Number(ttsRate.value).toFixed(2);
+  });
+
+  if (!("speechSynthesis" in window)) {
+    ttsVox.textContent = "não suportado";
+    ttsBtn.disabled = true;
+  } else {
+    var listarVozes = function () {
+      var vs = window.speechSynthesis.getVoices().filter(function (v) {
+        return v.lang && v.lang.toLowerCase().indexOf("pt") === 0;
+      });
+      ttsVox.textContent = vs.length
+        ? vs.length + (vs.length === 1 ? " voz pt" : " vozes pt")
+        : "nenhuma voz pt encontrada";
+      return vs;
+    };
+
+    listarVozes();
+    window.speechSynthesis.onvoiceschanged = listarVozes;
+
+    ttsBtn.addEventListener("click", function () {
+      var txt = (ttsText.value || "").trim();
+      if (!txt) return;
+
+      window.speechSynthesis.cancel();
+
+      var u = new SpeechSynthesisUtterance(txt);
+      u.lang = "pt-BR";
+      u.rate = Number(ttsRate.value);
+      u.pitch = 1;
+      u.volume = 1;
+
+      var vs = listarVozes();
+      if (vs.length) u.voice = vs[0];
+
+      u.onstart = function () {
+        ttsOut.innerHTML = '<span class="hl">falando…</span> ' +
+                           '<span class="dim">voz: ' +
+                           esc(u.voice ? u.voice.name : "padrão do sistema") +
+                           " · velocidade " + u.rate.toFixed(2) + "</span>";
+      };
+      u.onend = function () {
+        ttsOut.innerHTML = '<span class="good">pronto.</span> ' +
+                           '<span class="dim">Custo: zero. Funciona offline. ' +
+                           "Nada saiu do aparelho.</span>";
+      };
+      u.onerror = function () {
+        ttsOut.innerHTML = '<span class="hl">a síntese falhou neste aparelho.</span>';
+      };
+
+      window.speechSynthesis.speak(u);
+    });
+
+    ttsStop.addEventListener("click", function () {
+      window.speechSynthesis.cancel();
+      ttsOut.innerHTML = '<span class="dim">interrompido com speechSynthesis.cancel().</span>';
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch];
+    });
+  }
+})();
+</script>
