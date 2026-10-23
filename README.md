@@ -27,12 +27,7 @@ Essas duas fontes juntas respondem as perguntas que a literatura secundária nã
 
 Abrindo por `file://`, a **demo de reconhecimento de fala não funciona** — a Web Speech API exige HTTPS ou localhost. A síntese de voz funciona normalmente.
 
-Para testar o reconhecimento (o passo 1 do plano), use os links publicados:
-
-- Especificação: https://claude.ai/code/artifact/9ae3b95b-b8c5-424e-8650-8f1257ee6b55
-- Manual das ferramentas: https://claude.ai/code/artifact/b19ec59b-3441-4cd7-99e5-bac03abcb0f6
-
-Ou rode um servidor local:
+Para testar o reconhecimento (o passo 1 do plano), rode um servidor local:
 
 ```
 cd alfabetizacao-freire
