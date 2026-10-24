@@ -35,8 +35,18 @@ const vozFalsa = () => {
     return 'não sei';
   };
   // reconhecimento contínuo: entrega o texto logo e só termina quando mandam parar
+  // imita o Android: com um som (AudioContext) ligado, o microfone não ouve
+  const contextos = [];
+  const AC = window.AudioContext;
+  window.AudioContext = class extends AC {
+    constructor(...a) { super(...a); contextos.push(this); }
+  };
   window.SpeechRecognition = class {
     start() {
+      if (contextos.some((c) => c.state === 'running')) {
+        setTimeout(() => { this.onerror?.({ error: 'audio-capture' }); this.onend?.(); }, 5);
+        return;
+      }
       setTimeout(() => {
         const texto = responder();
         const r = [{ transcript: texto, confidence: 0.9 }];

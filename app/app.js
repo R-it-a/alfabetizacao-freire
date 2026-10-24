@@ -15,7 +15,7 @@ import {
 import { Lexico } from './lexico.js';
 import { icone, MASCOTE } from './icones.js';
 import { ilustracao, ILUSTRACOES } from './ilustracoes.js';
-import { tocar } from './som.js';
+import { tocar, silenciar } from './som.js';
 import { carregar, salvar, apagar, hoje, contarDia } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
 import {
@@ -197,6 +197,7 @@ function segurarParaFalar(area) {
       if (gravacao) return;
       try { $mic.setPointerCapture(e.pointerId); } catch { /* navegador antigo */ }
       pararDeFalar();
+      silenciar(); // som ligado atrapalha o microfone no Android
       navigator.vibrate?.(30);
       x0 = e.clientX;
       inicio = Date.now();
@@ -297,6 +298,7 @@ async function ouvirPessoa(raiz) {
     if (r.alternativas.length) return r.alternativas;
 
     falhas += 1;
+    if (r.erro) console.warn('Reconhecimento de voz:', r.erro);
     if (r.erro === 'not-allowed' || r.erro === 'service-not-allowed') {
       await dizer('Preciso que você deixe o aplicativo usar o microfone.');
     } else if (r.erro === 'network') {

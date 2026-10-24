@@ -4,6 +4,7 @@
  */
 
 let contexto = null;
+let desligar = setTimeout(silenciar, 1200);
 
 function ctx() {
   if (!contexto) {
@@ -35,10 +36,29 @@ const SONS = {
   fim: (c) => [523, 659, 784, 1047].forEach((f, i) => nota(c, f, i * 0.12, 0.4, 0.14, 'triangle'))
 };
 
+/**
+ * No Android, um AudioContext ligado ocupa o áudio e o reconhecimento de voz
+ * deixa de ouvir. Por isso o contexto é fechado logo depois de cada som, e
+ * antes de cada gravação.
+ */
+export function silenciar() {
+  clearTimeout(desligar);
+  const c = contexto;
+  contexto = null; // fechar libera o áudio de vez; o próximo som cria outro
+  try {
+    if (c && c.state !== 'closed') return c.close();
+  } catch {
+    /* nada a fazer */
+  }
+  return Promise.resolve();
+}
+
 export function tocar(nome) {
   try {
     const c = ctx();
     if (c && SONS[nome]) SONS[nome](c);
+    clearTimeout(desligar);
+    desligar = setTimeout(silenciar, 1200);
   } catch {
     /* sem áudio: segue sem som */
   }
