@@ -13,6 +13,7 @@ import {
   vozesDisponiveis, escolherVoz, vozAtual
 } from './voz.js';
 import { Lexico } from './lexico.js';
+import { icone } from './icones.js';
 import { carregar, salvar, apagar, hoje } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
 import {
@@ -44,7 +45,17 @@ async function dizer(texto, opcoes) {
   await falar(texto, opcoes);
 }
 
+$repetir.innerHTML = `${icone('falar')}<span>Ouvir de novo</span>`;
 $repetir.addEventListener('click', () => falar(ultimaFala));
+
+/** A trilha no topo mostra em que parte da sessão a pessoa está. */
+const ETAPAS = ['conversa', 'palavra', 'familias', 'ficha', 'criar', 'teclado', 'caderno'];
+const $trilha = document.getElementById('trilha');
+function etapa(nome) {
+  const atual = ETAPAS.indexOf(nome);
+  $trilha.innerHTML = atual < 0 ? '' : ETAPAS.map((_, i) =>
+    `<li class="${i < atual ? 'feita' : i === atual ? 'atual' : ''}"></li>`).join('');
+}
 
 /**
  * Troca a tela. Cada tela é um elemento novo, então os ouvintes de toque da
@@ -102,8 +113,8 @@ function segurarParaFalar(area) {
 
   area.innerHTML = `
     <div class="gravador">
-      <span class="lixeira" aria-hidden="true">🗑️</span>
-      <button class="mic" aria-label="Segure para falar">🎤</button>
+      <span class="lixeira" aria-hidden="true">${icone('lixeira')}</span>
+      <button class="mic" aria-label="Segure para falar">${icone('microfone')}</button>
     </div>
     <p class="mic-dica">Segure o botão enquanto fala</p>`;
   const $gravador = area.querySelector('.gravador');
@@ -272,7 +283,7 @@ async function praticarLeitura(raiz, silabas, palavra) {
 
 async function motivacao() {
   const raiz = mostrar(`
-    <div class="icone-grande">🤲</div>
+    <div class="icone-grande">${icone('maos')}</div>
     <div class="mic-area"></div>`);
   await dizer('Antes de começar a ler, quero conversar um pouco com você.');
   await dizer('Pensa em alguém fazendo um bolo, costurando uma roupa ou plantando uma roça. ' +
@@ -292,7 +303,7 @@ async function abertura() {
   const paraLer = [...new Set([...estado.revisar, ...daUltima])].slice(0, 3);
   if (!paraLer.length) return;
 
-  mostrar('<div class="icone-grande">👋</div>');
+  mostrar(`<div class="icone-grande">${icone('aceno')}</div>`);
   await dizer('Que bom te ver de novo! Vamos ler as palavras da última vez.');
 
   for (const palavra of paraLer) {
@@ -313,8 +324,9 @@ async function abertura() {
 
 /** Pergunta, ouve e escolhe a palavra geradora com a pessoa. */
 async function encontrarPalavra() {
+  etapa('conversa');
   for (let tentativa = 0; tentativa < 3; tentativa += 1) {
-    const raiz = mostrar('<div class="icone-grande">💬</div><div class="mic-area"></div>');
+    const raiz = mostrar(`<div class="icone-grande">${icone('conversa')}</div><div class="mic-area"></div>`);
     await dizer(tentativa === 0 ? perguntaDoDia(estado, 0) : `E ${perguntaDoDia(estado, tentativa).toLowerCase()}`);
     const alternativas = await ouvirPessoa(raiz);
     const { candidatas, debate } = await interpretar(alternativas, estado, lexico);
@@ -322,10 +334,10 @@ async function encontrarPalavra() {
     for (const candidata of candidatas.slice(0, 2)) {
       const palavra = candidata.palavra;
       const conf = mostrar(`
-        <div class="icone-grande">👂</div>
+        <div class="icone-grande">${icone('ouvido')}</div>
         <div class="botoes">
-          <button class="btn sim" data-acao="sim" aria-label="Sim">✓</button>
-          <button class="btn nao" data-acao="nao" aria-label="Não">✗</button>
+          <button class="btn sim" data-acao="sim" aria-label="Sim">${icone('certo')}</button>
+          <button class="btn nao" data-acao="nao" aria-label="Não">${icone('errado')}</button>
         </div>`);
       await dizer(`Ouvi ${palavra}. Vamos aprender essa palavra?`);
       const resposta = await esperarToque(...conf.querySelectorAll('.botoes .btn'));
@@ -340,13 +352,14 @@ async function encontrarPalavra() {
 }
 
 async function conversa(palavra, debate) {
-  const raiz = mostrar('<div class="icone-grande">💬</div><div class="mic-area"></div>');
+  const raiz = mostrar(`<div class="icone-grande">${icone('conversa')}</div><div class="mic-area"></div>`);
   await dizer(debate || perguntaDeDebate(palavra));
   await ouvirPessoa(raiz);
   await dizer('Obrigada por me contar.');
 }
 
 async function palavraGeradora(palavra) {
+  etapa('palavra');
   const silabas = silabar(palavra);
   const raiz = mostrar(`${silabasHtml(silabas)}<div class="mic-area"></div>`, 'foco');
   await dizer(`Essa é a palavra ${palavra}.`);
@@ -357,6 +370,7 @@ async function palavraGeradora(palavra) {
 }
 
 async function familias(palavra) {
+  etapa('familias');
   const ficha = fichaDescoberta(palavra);
 
   for (const [n, f] of ficha.familias.entries()) {
@@ -399,6 +413,7 @@ function gradeHtml(ficha, tocavel) {
 }
 
 async function fichaLer(palavra) {
+  etapa('ficha');
   const ficha = fichaDescoberta(palavra);
   const raiz = mostrar(`${gradeHtml(ficha, false)}<div class="vogais"></div>`, 'foco');
   const cel = (l, c) => raiz.querySelector(`.cel[data-l="${l}"][data-c="${c}"]`);
@@ -429,19 +444,20 @@ async function fichaLer(palavra) {
 
 /** O momento em que a pessoa para de repetir e começa a criar. */
 async function fichaCriar(palavra) {
+  etapa('criar');
   const ficha = fichaDescoberta(palavra);
   const criadas = [];
   const raiz = mostrar(`
     ${gradeHtml(ficha, true)}
     <div class="montagem" aria-live="polite"></div>
     <div class="botoes">
-      <button class="btn" data-acao="ler" aria-label="Ler o que formei">🔊</button>
-      <button class="btn" data-acao="apagar" aria-label="Apagar">⌫</button>
-      <button class="btn sim" data-acao="guardar" aria-label="Guardar palavra">✓</button>
-      <button class="btn" data-acao="ajuda" aria-label="Ajuda">💡</button>
+      <button class="btn" data-acao="ler" aria-label="Ler o que formei">${icone('falar')}</button>
+      <button class="btn" data-acao="apagar" aria-label="Apagar">${icone('apagar')}</button>
+      <button class="btn sim" data-acao="guardar" aria-label="Guardar palavra">${icone('certo')}</button>
+      <button class="btn" data-acao="ajuda" aria-label="Ajuda">${icone('ideia')}</button>
     </div>
     <div class="criadas"></div>
-    <button class="btn largo" data-acao="terminei" hidden>Terminei ➜</button>`, 'foco');
+    <button class="btn largo principal" data-acao="terminei" hidden>Terminei</button>`, 'foco');
 
   const $montagem = raiz.querySelector('.montagem');
   const $criadas = raiz.querySelector('.criadas');
@@ -516,6 +532,7 @@ async function fichaCriar(palavra) {
 
 /** Ditado curto com o teclado de sílabas (fluxo da sessão, seção 05). */
 async function teclado(palavra, criadas) {
+  etapa('teclado');
   const reais = criadas.filter((c) => c.real && silabar(compactar(c.palavra)).length >= 2).map((c) => c.palavra);
   const extra = lexico.possiveis(palavra).filter((p) => lexico.comum(p) && silabar(compactar(p)).length >= 2);
   const alvos = [...new Set([palavra, ...reais, ...extra])]
@@ -532,9 +549,9 @@ async function teclado(palavra, criadas) {
         `<div class="linha">${linha.map((s) => `<button class="sil tecla" data-s="${esc(s)}">${esc(s)}</button>`).join('')}</div>`
       ).join('')}</div>
       <div class="botoes">
-        <button class="btn" data-acao="ouvir" aria-label="Ouvir a palavra">🔊</button>
-        <button class="btn" data-acao="apagar" aria-label="Apagar">⌫</button>
-        <button class="btn sim" data-acao="pronto" aria-label="Pronto">✓</button>
+        <button class="btn" data-acao="ouvir" aria-label="Ouvir a palavra">${icone('falar')}</button>
+        <button class="btn" data-acao="apagar" aria-label="Apagar">${icone('apagar')}</button>
+        <button class="btn sim" data-acao="pronto" aria-label="Pronto">${icone('certo')}</button>
       </div>`, 'foco');
 
     const $escrita = raiz.querySelector('.escrita');
@@ -592,11 +609,12 @@ async function teclado(palavra, criadas) {
 }
 
 async function caderno(palavra, criadas) {
+  etapa('caderno');
   const doDia = [...new Set([palavra, ...criadas.filter((c) => c.real).map((c) => c.palavra)])].slice(0, 4);
   const raiz = mostrar(`
-    <div class="icone-grande">📓✏️</div>
+    <div class="icone-grande">${icone('caderno')}</div>
     <ul class="lista-caderno">${doDia.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
-    <button class="btn largo sim" data-acao="terminei">Terminei ✓</button>`);
+    <button class="btn largo principal" data-acao="terminei">Terminei</button>`);
   await dizer('Agora pega o seu caderno e um lápis. Escreve essas palavras, uma embaixo da outra.');
   await dizer('Quando terminar, toca no botão.');
   await esperarToque(raiz.querySelector('[data-acao="terminei"]'));
@@ -604,9 +622,10 @@ async function caderno(palavra, criadas) {
 }
 
 async function fechamento() {
+  etapa('');
   const total = estado.pastinha.filter((p) => p.real).length;
   const raiz = mostrar(`
-    <div class="icone-grande">🌱</div>
+    <div class="icone-grande">${icone('broto')}</div>
     <p class="grande">${total} ${total === 1 ? 'palavra' : 'palavras'} na sua pastinha</p>
     <button class="btn largo" data-acao="inicio">Voltar ao início</button>`);
   await dizer(`Você já tem ${total} ${total === 1 ? 'palavra' : 'palavras'} na sua pastinha. ` +
@@ -655,7 +674,7 @@ async function telaVoz() {
     <p class="aviso">Toque para ouvir. A voz tocada por último fica escolhida.</p>
     <div class="vozes">${vozes.map((v, i) => `
       <button class="btn largo voz ${v.name === vozAtual() ? 'sim' : ''}" data-i="${i}">
-        ${v.name === vozAtual() ? '✓ ' : ''}${esc(v.name)}
+        ${esc(v.name)}
       </button>`).join('') || '<p>Nenhuma voz em português neste aparelho.</p>'}</div>
     <button class="btn largo" data-acao="voltar">Voltar</button>`);
 
@@ -665,7 +684,7 @@ async function telaVoz() {
     raiz.querySelectorAll('.voz').forEach((x) => {
       const escolhida = x === b;
       x.classList.toggle('sim', escolhida);
-      x.textContent = `${escolhida ? '✓ ' : ''}${vozes[Number(x.dataset.i)].name}`;
+
     });
     await dizer('Olá! Vamos aprender a ler e escrever juntos?');
   }));
@@ -675,12 +694,17 @@ async function telaVoz() {
 async function inicio() {
   for (;;) {
     const raiz = mostrar(`
-      <h1 class="marca">Palavra</h1>
-      <button class="btn largo sim comecar" data-acao="comecar">Começar ▶</button>
-      <button class="btn largo" data-acao="pastinha">📁 Minha pastinha</button>
-      <button class="btn largo" data-acao="voz">🔊 Escolher voz</button>
+      <h1 class="marca" aria-label="Palavra">
+        <span class="sil">pa</span><span class="sil">la</span><span class="sil">vra</span>
+      </h1>
+      <button class="btn largo principal comecar" data-acao="comecar">${icone('comecar')} Começar</button>
+      <div class="secundarios">
+        <button class="btn" data-acao="pastinha">${icone('pasta')} Minha pastinha</button>
+        <button class="btn" data-acao="voz">${icone('falar')} Escolher voz</button>
+      </div>
       <button class="link" data-acao="zerar">Apagar meu progresso</button>`, 'inicio');
     $legenda.textContent = '';
+    etapa('');
     const acao = await esperarToque(...raiz.querySelectorAll('[data-acao]'));
 
     if (acao === 'pastinha') { await pastinha(); continue; }

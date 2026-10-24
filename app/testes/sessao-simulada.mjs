@@ -53,7 +53,8 @@ const navegador = await chromium.launch({ executablePath: process.env.CHROMIUM |
 const pagina = await navegador.newPage({ viewport: { width: 390, height: 844 } });
 const erros = [];
 pagina.on('pageerror', (e) => erros.push(String(e)));
-pagina.on('console', (m) => m.type() === 'error' && erros.push(m.text()));
+// fontes do Google podem faltar sem internet; o app usa as fontes do sistema no lugar
+pagina.on('console', (m) => m.type() === 'error' && !/ERR_TUNNEL|ERR_NAME_NOT_RESOLVED|fonts\.g/.test(m.text()) && erros.push(m.text()));
 await pagina.addInitScript(vozFalsa);
 await pagina.addInitScript(() => { window.__errarUmaVez = true; });
 await pagina.goto(URL_APP);

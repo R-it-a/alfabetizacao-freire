@@ -3,7 +3,7 @@
  * Só ouvir a fala precisa de rede. Troque a versão do cache a cada publicação.
  */
 
-const CACHE = 'palavra-v2';
+const CACHE = 'palavra-v3';
 const ARQUIVOS = [
   './',
   'index.html',
@@ -15,6 +15,7 @@ const ARQUIVOS = [
   'lexico.js',
   'estado.js',
   'cerebro.js',
+  'icones.js',
   'lexico.txt',
   'manifest.json',
   'icones/icone-192.png',
@@ -34,7 +35,24 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+const FONTES = ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'];
+
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
+  if (e.request.method !== 'GET') return;
+  const origem = new URL(e.request.url).origin;
+
+  // fontes do Google: guarda na primeira vez para funcionar sem internet
+  if (FONTES.includes(origem)) {
+    e.respondWith(caches.open(CACHE).then(async (c) => {
+      const salvo = await c.match(e.request);
+      if (salvo) return salvo;
+      const resposta = await fetch(e.request);
+      if (resposta.ok || resposta.type === 'opaque') c.put(e.request, resposta.clone());
+      return resposta;
+    }));
+    return;
+  }
+
+  if (origem !== location.origin) return;
   e.respondWith(caches.match(e.request).then((salvo) => salvo || fetch(e.request)));
 });
