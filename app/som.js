@@ -4,7 +4,7 @@
  */
 
 let contexto = null;
-let desligar = setTimeout(silenciar, 1200);
+let desligar = null;
 
 function ctx() {
   if (!contexto) {

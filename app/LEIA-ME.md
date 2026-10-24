@@ -9,7 +9,7 @@ No Chrome do Android, o menu ⋮ → "Adicionar à tela inicial" instala como ap
 
 Cara de jogo, para dar vontade de voltar no dia seguinte: tela clara, botões e sílabas com "degrau" (parecem apertáveis), barra de progresso da lição, o **Calango** (o lagartinho da caatinga) falando num balão, aviso verde de acerto e laranja de "quase" subindo da parte de baixo com som, trilha de lições na tela inicial com dias seguidos e comemoração com confete no fim. O app abre com os tijolos PA LA VRA caindo, cada tela entra deslizando, as sílabas caem como tijolos e o balão dá um pulinho a cada fala. Nunca aparece vermelho nem "errado".
 
-A conversa sobre cultura é a primeira bolinha da trilha e pode ser revista a qualquer momento.
+A conversa sobre cultura é a primeira lição da trilha (sete cenas: natureza, pote de barro, arco e flecha, espingarda, gato, cantadores e "o que você sabe fazer bem?") e pode ser revista a qualquer momento tocando na bolinha dourada.
 
 ## Falar com o app
 
@@ -25,7 +25,7 @@ A qualidade depende do aparelho. Para uma voz realmente humana, as opções são
 
 ## O que acontece numa sessão
 
-1. **Motivação** (só na primeira vez): conversa curta sobre cultura.
+1. **Motivação** (primeira lição, uma vez): sete cenas de natureza e cultura, cada uma com uma pergunta. A primeira palavra só vem na lição seguinte.
 2. **Abertura** (a partir da segunda): a pessoa lê as palavras da última sessão e as que ficaram para revisar.
 3. **Pergunta**: "O que você comeu hoje?" (as perguntas mudam por estágio).
 4. **Palavra geradora**: o app tira da fala as palavras do estágio da pessoa, pontua e confirma ("Ouvi BOLO. Vamos aprender essa palavra?").
@@ -75,7 +75,7 @@ Estão no código e merecem revisão com uso real:
 - **Estágio sobe a cada 3 palavras geradoras** (`PALAVRAS_POR_ESTAGIO` em `metodo.js`).
 - **Família repetida conta como certa com 3 de 5 sílabas reconhecidas**: o reconhecimento de voz é fraco com sílabas soltas.
 - **A diferença entre palavras reais e inventadas** começa a ser comentada a partir da 4ª sessão.
-- **A motivação é só falada.** A fase original usava cenas desenhadas; as imagens ainda precisam ser criadas.
+- **A motivação tem 7 cenas**, não as 10 originais, escolhidas entre as que o documento 01 cita.
 - **Sem o Worker**, a palavra é escolhida só pela fonética e pela frequência, sem o critério de teor pragmático.
 
 ## Créditos do dicionário

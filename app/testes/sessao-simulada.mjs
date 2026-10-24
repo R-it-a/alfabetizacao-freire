@@ -1,5 +1,5 @@
 /**
- * Simula duas sessões completas no navegador, com voz falsa.
+ * Simula a lição de cultura e duas sessões completas no navegador, com voz falsa.
  *
  *   python -m http.server 8000          (na raiz do repositório)
  *   node app/testes/sessao-simulada.mjs [http://localhost:8000/app/]
@@ -73,6 +73,7 @@ const silabar = (p) => pagina.evaluate(async (w) => (await import('../codigo/sil
 const visivel = async (seletor) => (await pagina.locator(seletor).count()) > 0 && pagina.locator(seletor).first().isVisible();
 let prints = 0;
 let lixoTestado = false;
+let cenasCultura = 0;
 const print = async (nome) => {
   if (PASTA_PRINTS) await pagina.waitForTimeout(900);
   if (PASTA_PRINTS) await pagina.screenshot({ path: `${PASTA_PRINTS}/${String(++prints).padStart(2, '0')}-${nome}.png`, fullPage: true });
@@ -87,6 +88,11 @@ async function umaSessao(numero) {
     await pagina.waitForTimeout(30);
     const legenda = await pagina.locator('#legenda').textContent();
 
+    if (await visivel('[data-acao="seguir"]')) {
+      await print(`s${numero}-cultura-fim`);
+      await pagina.click('[data-acao="seguir"]');
+      return;
+    }
     if (await visivel('[data-acao="inicio"]')) {
       await print(`s${numero}-fechamento`);
       await pagina.click('[data-acao="inicio"]');
@@ -94,7 +100,7 @@ async function umaSessao(numero) {
     }
     if (await visivel('button.mic')) {
       const tela = (legenda || '').slice(0, 25);
-      if (!vistos.has(tela)) { vistos.add(tela); await print(`s${numero}-fala`); }
+      if (!vistos.has(tela)) { vistos.add(tela); await print(`s${numero}-fala`); if (numero === 0) cenasCultura += 1; }
       const caixa = await pagina.locator('button.mic').boundingBox();
       const x = caixa.x + caixa.width / 2;
       const y = caixa.y + caixa.height / 2;
@@ -156,6 +162,7 @@ async function umaSessao(numero) {
 
 await pagina.waitForSelector(".comecar");
 await print('inicio');
+await umaSessao(0); // a conversa sobre cultura
 await umaSessao(1);
 await umaSessao(2);
 
@@ -166,7 +173,8 @@ const falhas = [];
 if (estado.sessoes !== 2) falhas.push(`sessoes = ${estado.sessoes}`);
 if (estado.palavras[0] !== 'bolo') falhas.push(`primeira palavra = ${estado.palavras[0]}`);
 if (estado.palavras.length !== 2) falhas.push(`palavras = ${estado.palavras}`);
-if (!estado.motivacao_feita) falhas.push('motivação não marcada');
+if (!estado.cultura_feita) falhas.push('conversa sobre cultura não marcada');
+if (cenasCultura < 7) falhas.push(`só ${cenasCultura} cenas de cultura`);
 for (const p of ['bola', 'bala', 'pena']) {
   if (!estado.pastinha.some((x) => x.palavra === p && x.real)) falhas.push(`${p} fora da pastinha`);
 }
@@ -179,4 +187,4 @@ if (falhas.length) {
   console.error('FALHOU:\n- ' + falhas.join('\n- '));
   process.exit(1);
 }
-console.log('OK: duas sessões completas.');
+console.log(`OK: cultura (${cenasCultura} cenas) e duas sessões completas.`);

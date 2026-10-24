@@ -4,7 +4,7 @@
  * quando não há. Só ouvir a fala precisa de rede.
  */
 
-const CACHE = 'palavra-v7';
+const CACHE = 'palavra-v8';
 const ARQUIVOS = [
   './',
   'index.html',

@@ -16,7 +16,7 @@ export const VAZIO = Object.freeze({
   sessoes: 0,
   diasSeguidos: 0,             // dias seguidos com sessão
   ultimaSessao: null,         // 'AAAA-MM-DD'
-  motivacao_feita: false,
+  cultura_feita: false,       // a conversa sobre cultura (fase de motivação), uma vez
   explicou_palavras_mortas: false
 });
 
