@@ -4,3 +4,5 @@ __pycache__/
 # Fontes primárias ficam só locais (direito autoral); ver fontes/README.md
 fontes/*
 !fontes/README.md
+node_modules
+codigo/resultado-testes.txt

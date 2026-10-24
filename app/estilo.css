@@ -1,0 +1,258 @@
+/* Palavra — feito para celular, para quem ainda não lê: pouco texto, letras
+   grandes, botões grandes, tudo com som. Cores dos documentos do projeto. */
+
+:root {
+  --fundo: #F2F4F7;
+  --cartao: #FFFFFF;
+  --linha: #C9D1DE;
+  --texto: #161B24;
+  --texto-2: #4A5464;
+  --tinta: #1B3A6B;
+  --tinta-suave: #E3EAF6;
+  --luz: #A8741A;
+  --luz-suave: #F6EBD5;
+  --certo: #1E7A46;
+  --certo-suave: #DDF2E5;
+  --atencao: #B4541A;
+  --atencao-suave: #FBE5D6;
+  --sombra: 0 1px 2px rgba(22, 27, 36, .06), 0 8px 24px -12px rgba(22, 27, 36, .2);
+  --raio: 14px;
+  --fonte: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fundo: #0E131C;
+    --cartao: #151C28;
+    --linha: #2C3849;
+    --texto: #E8ECF3;
+    --texto-2: #AEB9C9;
+    --tinta: #8CB0EC;
+    --tinta-suave: #182740;
+    --luz: #E0AE55;
+    --luz-suave: #2A2214;
+    --certo: #5BC489;
+    --certo-suave: #12301F;
+    --atencao: #F0965A;
+    --atencao-suave: #3A2214;
+    --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px -14px rgba(0, 0, 0, .7);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--fonte);
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }
+
+.barra {
+  display: flex;
+  justify-content: flex-end;
+  padding: max(.75rem, env(safe-area-inset-top)) 1rem .5rem;
+}
+
+.btn-ouvir {
+  border: 1px solid var(--linha);
+  background: var(--cartao);
+  border-radius: 999px;
+  padding: .55rem 1rem;
+  font-size: 1rem;
+}
+
+.tela { flex: 1; display: flex; padding: 0 1rem; }
+
+.conteudo {
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 0 2rem;
+}
+
+.rodape { padding: .5rem 1rem max(1rem, env(safe-area-inset-bottom)); min-height: 4.5rem; }
+
+.legenda {
+  max-width: 34rem;
+  margin: 0 auto;
+  color: var(--texto-2);
+  font-size: 1rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- início */
+
+.marca { font-size: 3rem; margin: 0 0 1rem; color: var(--tinta); letter-spacing: -.02em; }
+.inicio .conteudo { justify-content: center; }
+
+.icone-grande { font-size: 5rem; line-height: 1; }
+.grande { font-size: 1.6rem; text-align: center; margin: 0; }
+
+/* ---------------------------------------------------------------- botões */
+
+.btn {
+  min-width: 4.5rem;
+  min-height: 4.5rem;
+  padding: .75rem 1.25rem;
+  border: 2px solid var(--linha);
+  border-radius: var(--raio);
+  background: var(--cartao);
+  box-shadow: var(--sombra);
+  font-size: 1.8rem;
+}
+.btn:active { transform: scale(.97); }
+.btn.sim { border-color: var(--certo); background: var(--certo-suave); color: var(--certo); }
+.btn.nao { border-color: var(--atencao); background: var(--atencao-suave); color: var(--atencao); }
+.btn.largo { width: 100%; font-size: 1.4rem; }
+.comecar { font-size: 1.8rem !important; min-height: 6rem; }
+
+.botoes { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+
+.link { background: none; border: 0; color: var(--texto-2); text-decoration: underline; font-size: .95rem; }
+
+/* ---------------------------------------------------------------- microfone */
+
+.mic-area { display: flex; flex-direction: column; align-items: center; gap: .5rem; min-height: 8rem; }
+
+.mic {
+  width: 7rem;
+  height: 7rem;
+  border-radius: 50%;
+  border: 0;
+  background: var(--tinta);
+  color: #fff;
+  font-size: 3rem;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--sombra);
+}
+.mic.ouvindo { animation: pulsar 1.2s ease-in-out infinite; }
+@keyframes pulsar {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tinta) 45%, transparent); }
+  50% { box-shadow: 0 0 0 18px transparent; }
+}
+.mic-dica { margin: 0; color: var(--texto-2); font-size: 1.1rem; }
+
+.digitar { display: flex; gap: .5rem; width: 100%; }
+.digitar input {
+  flex: 1;
+  font-size: 1.2rem;
+  padding: .75rem;
+  border-radius: var(--raio);
+  border: 2px solid var(--linha);
+  background: var(--cartao);
+  color: var(--texto);
+}
+.digitar .btn { min-height: auto; font-size: 1.1rem; }
+.aviso { font-size: .9rem; color: var(--texto-2); text-align: center; margin: 0; }
+
+/* ---------------------------------------------------------------- sílabas */
+
+.sil {
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: .02em;
+  border-radius: 10px;
+  transition: background .15s, color .15s, transform .15s;
+}
+
+.palavra { display: flex; gap: .4rem; font-size: clamp(2.6rem, 14vw, 4.5rem); }
+.palavra .sil { padding: .1em .2em; background: var(--cartao); box-shadow: var(--sombra); }
+
+.familia, .vogais, .montagem, .escrita {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  justify-content: center;
+  font-size: clamp(1.6rem, 8vw, 2.4rem);
+}
+.familia .sil, .vogais .sil, .montagem .sil, .escrita .sil {
+  padding: .15em .35em;
+  background: var(--cartao);
+  border: 1px solid var(--linha);
+}
+
+.montagem, .escrita {
+  min-height: 3.4rem;
+  width: 100%;
+  border-bottom: 3px solid var(--tinta);
+  padding-bottom: .4rem;
+}
+.escrita .vazio { color: var(--texto-2); }
+
+.acesa { background: var(--luz-suave) !important; color: var(--luz); transform: scale(1.08); }
+.certa, .escrita.certa .sil { background: var(--certo-suave) !important; color: var(--certo); }
+.atencao { background: var(--atencao-suave) !important; color: var(--atencao); outline: 3px solid var(--atencao); }
+
+/* ficha da descoberta */
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(var(--colunas), 1fr);
+  gap: .4rem;
+  width: 100%;
+}
+.cel {
+  display: grid;
+  place-items: center;
+  min-height: 3.6rem;
+  font-size: clamp(1.2rem, 6vw, 1.8rem);
+  background: var(--cartao);
+  border: 2px solid var(--linha);
+  box-shadow: var(--sombra);
+}
+button.cel:active { transform: scale(.94); }
+
+.criadas { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+.chip {
+  padding: .45rem .9rem;
+  border-radius: 999px;
+  background: var(--tinta-suave);
+  color: var(--tinta);
+  border: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* teclado de sílabas */
+.teclado { display: flex; flex-direction: column; gap: .4rem; width: 100%; }
+.teclado .linha { display: grid; grid-template-columns: repeat(5, 1fr); gap: .4rem; }
+.tecla {
+  min-height: 3.4rem;
+  font-size: clamp(1.1rem, 5.5vw, 1.6rem);
+  background: var(--cartao);
+  border: 2px solid var(--linha);
+}
+.tecla:active { background: var(--luz-suave); }
+
+/* caderno */
+.lista-caderno {
+  list-style: none;
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  width: 100%;
+  background: var(--cartao);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  font-size: clamp(2rem, 10vw, 3rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.6;
+  text-align: center;
+}
+
+pre { white-space: pre-wrap; font-size: .8rem; max-width: 100%; overflow: auto; }

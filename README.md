@@ -1,5 +1,7 @@
 # App de alfabetização de adultos — método Paulo Freire
 
+**Abrir o app no celular:** https://r-it-a.github.io/alfabetizacao-freire/app/ (Chrome no Android). Como funciona e como testar: [`app/LEIA-ME.md`](app/LEIA-ME.md).
+
 Material produzido em 04/08/2026.
 
 ## Arquivos
@@ -37,6 +39,14 @@ python -m http.server 8000
 
 e abra `http://localhost:8000/02-manual-das-ferramentas.html`.
 
+## Pastas
+
+| Pasta | O que é |
+|---|---|
+| `app/` | O aplicativo (PWA): sessão completa com voz, ficha da descoberta, teclado de sílabas e caderno. |
+| `codigo/` | O silabador, núcleo determinístico usado pelo app. |
+| `worker/` | Proxy opcional que liga o app ao Claude. |
+
 ## Próximo passo
 
-Testar o reconhecimento de fala no celular de um aluno, no ambiente real dele. Cinco frases, meia hora. É a única incógnita que pode mudar o desenho do projeto.
+O reconhecimento de voz foi testado com sucesso (23/10/2026, com a autora no papel de aluna). Próximos: usar o app numa sessão real com alguém em alfabetização, ligar o Claude pelo Worker e criar as imagens da fase de motivação.

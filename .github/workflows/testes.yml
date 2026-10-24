@@ -1,0 +1,29 @@
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Silabador (Python)
+        run: cd codigo && python teste_silabador.py
+      - name: Lógica do app (Node)
+        run: node --test app/testes/*.test.mjs
+      - name: Sessão simulada no navegador
+        run: |
+          npm i --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+          python -m http.server 8000 &
+          sleep 2
+          node app/testes/sessao-simulada.mjs http://localhost:8000/app/
