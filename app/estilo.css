@@ -1,6 +1,6 @@
 /* Palavra: visual de jogo, claro e gordinho.
    Botões e cartões com "degrau" embaixo (parecem apertáveis), barra de
-   progresso no topo, o Tijolinho com balão de fala, aviso que sobe de baixo
+   progresso no topo, o Calango com balão de fala, aviso que sobe de baixo
    e trilha de lições. Letra Nunito, arredondada e fácil de ler. */
 
 :root {
@@ -101,15 +101,18 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 
 .mascote { width: 6rem; flex: none; }
-.tijolinho { width: 100%; height: auto; display: block; overflow: visible; }
-.tijolinho .bracos-cima { display: none; }
+.mascote-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.mascote-svg .bracos-cima { display: none; }
 .mascote.comemora .bracos-cima { display: inline; }
 .mascote.comemora .bracos-baixo { display: none; }
-.mascote.comemora .tijolinho { animation: pular .6s ease-in-out infinite; }
-.mascote.feliz .tijolinho { animation: pular .5s ease-in-out 2; }
-.mascote.falando .boca { animation: falar .28s ease-in-out infinite alternate; transform-origin: 60px 74px; }
+.mascote.comemora .mascote-svg { animation: pular .6s ease-in-out infinite; }
+.mascote.feliz .mascote-svg { animation: pular .5s ease-in-out 2; }
+.mascote.falando .boca { animation: falar .28s ease-in-out infinite alternate; transform-origin: 70px 70px; }
 .mascote.pensando .pupila { transform: translate(-3px, -3px); }
-.tijolinho .olhos { animation: piscar 4.5s infinite; transform-origin: 60px 54px; }
+.mascote-svg .olhos { animation: piscar 4.5s infinite; transform-origin: 70px 44px; }
+.mascote-svg .rabo { animation: abanar 2.4s ease-in-out infinite; transform-origin: 92px 112px; }
+@keyframes abanar { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-7deg); } }
+.mascote.comemora .rabo, .mascote.feliz .rabo { animation-duration: .5s; }
 
 @keyframes pular { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 @keyframes falar { from { transform: scaleY(.45); } to { transform: scaleY(1.15); } }
@@ -592,9 +595,9 @@ pre { white-space: pre-wrap; font-size: .8rem; max-width: 100%; overflow: auto; 
 @keyframes pulo-balao { from { transform: scale(.94); } to { transform: none; } }
 
 /* o mascote respira devagar quando está parado */
-.mascote .tijolinho { animation: respirar 3s ease-in-out infinite; transform-origin: 60px 118px; }
+.mascote .mascote-svg { animation: respirar 3s ease-in-out infinite; transform-origin: 70px 138px; }
 @keyframes respirar { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.02, .98); } }
-.mascote.falando .tijolinho { animation: balancar .6s ease-in-out infinite alternate; }
+.mascote.falando .mascote-svg { animation: balancar .6s ease-in-out infinite alternate; transform-origin: 70px 138px; }
 @keyframes balancar { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
 .mascote.pensando .sobrancelha { transform: translateY(-3px); }
 .mascote.feliz .sobrancelha, .mascote.comemora .sobrancelha { transform: translateY(-4px); }
@@ -622,7 +625,7 @@ pre { white-space: pre-wrap; font-size: .8rem; max-width: 100%; overflow: auto; 
 }
 .abertura.saindo { opacity: 0; transform: scale(1.06); }
 .abertura-mascote { width: 8rem; animation: surgir .6s cubic-bezier(.3, 1.6, .5, 1) .75s both; }
-.abertura-mascote .tijolinho { width: 100%; height: auto; }
+.abertura-mascote .mascote-svg { width: 100%; height: auto; }
 @keyframes surgir { from { opacity: 0; transform: scale(.3) translateY(30px); } to { opacity: 1; transform: none; } }
 .abertura-nome { display: flex; gap: .4rem; }
 .abertura-nome span {

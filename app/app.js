@@ -47,7 +47,7 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
 $mascote.innerHTML = MASCOTE;
 
-/** O humor do Tijolinho: normal, falando, feliz, comemora ou pensando. */
+/** O humor do Calango: normal, falando, feliz, comemora ou pensando. */
 function humor(nome = '') {
   $mascote.className = `mascote ${nome}`;
 }
@@ -853,7 +853,7 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 
 Lexico.carregar().then((l) => { lexico = l; }).catch((e) => console.warn(e));
 
-/** Abertura: os tijolos PA LA VRA caem um a um e o Tijolinho aparece. */
+/** Abertura: os tijolos PA LA VRA caem um a um e o Calango aparece. */
 const $abertura = document.getElementById('abertura');
 if ($abertura) {
   $abertura.querySelector('.abertura-mascote').innerHTML = MASCOTE;

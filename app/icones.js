@@ -68,45 +68,64 @@ export const ICONES = {
 export const icone = (nome) => ICONES[nome] || '';
 
 /**
- * O Tijolinho, mascote do app: um tijolo, porque a gente constrói palavras
- * sílaba por sílaba, como uma parede. O estado (falando, feliz, comemora,
- * pensando) é uma classe no elemento que o contém, animada no CSS.
+ * O Calango, mascote do app: o lagartinho da caatinga que vive no sol.
+ * O estado (falando, feliz, comemora, pensando) é uma classe no elemento que
+ * o contém, animada no CSS: braços, boca, olhos e sobrancelhas mudam.
  */
 export const MASCOTE = `
-<svg class="tijolinho" viewBox="0 0 120 130" aria-hidden="true">
+<svg class="mascote-svg" viewBox="0 0 140 150" aria-hidden="true">
   <defs>
-    <linearGradient id="tj-corpo" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#F58A52"/><stop offset="1" stop-color="#E05E2E"/>
+    <linearGradient id="cl-pele" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9BD86A"/><stop offset="1" stop-color="#5FAE3A"/>
+    </linearGradient>
+    <linearGradient id="cl-barriga" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFF1A8"/><stop offset="1" stop-color="#F2D45C"/>
     </linearGradient>
   </defs>
-  <ellipse class="sombra" cx="60" cy="122" rx="34" ry="5" fill="#000" opacity=".12"/>
-  <g class="bracos-baixo" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round">
-    <path d="M22 66 Q8 76 13 92 Q16 96 20 92 Q18 80 27 74z" fill="#E05E2E"/>
-    <path d="M98 66 Q112 76 107 92 Q104 96 100 92 Q102 80 93 74z" fill="#E05E2E"/>
-  </g>
-  <g class="bracos-cima" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round">
-    <path d="M24 62 Q6 52 10 32 Q14 28 18 32 Q18 48 30 54z" fill="#E05E2E"/>
-    <path d="M96 62 Q114 52 110 32 Q106 28 102 32 Q102 48 90 54z" fill="#E05E2E"/>
-  </g>
-  <g class="pernas" fill="#B9472A" stroke="#3A2A22" stroke-width="3">
-    <rect x="38" y="98" width="15" height="20" rx="7"/><rect x="67" y="98" width="15" height="20" rx="7"/>
-  </g>
-  <g class="corpo" stroke="#3A2A22" stroke-width="3.5" stroke-linejoin="round">
-    <rect x="18" y="24" width="84" height="80" rx="18" fill="url(#tj-corpo)"/>
-    <path d="M20 50h80M20 78h80M50 26v24M80 50v28M44 78v24M84 78v24" stroke="#C94E22" stroke-width="2.5" opacity=".55"/>
-    <path d="M30 32 Q34 28 46 29" fill="none" stroke="#FFD3B8" stroke-width="4" opacity=".9"/>
-  </g>
-  <g class="rosto">
-    <path class="sobrancelha" d="M34 40 Q43 35 52 39 M68 39 Q77 35 86 40" fill="none" stroke="#3A2A22" stroke-width="3.5" stroke-linecap="round"/>
-    <g class="olhos">
-      <ellipse cx="44" cy="55" rx="11" ry="12" fill="#fff" stroke="#3A2A22" stroke-width="3"/>
-      <ellipse cx="76" cy="55" rx="11" ry="12" fill="#fff" stroke="#3A2A22" stroke-width="3"/>
-      <circle class="pupila" cx="46" cy="57" r="6" fill="#2A2A2A"/><circle class="pupila" cx="78" cy="57" r="6" fill="#2A2A2A"/>
-      <circle cx="48.5" cy="54" r="2.2" fill="#fff"/><circle cx="80.5" cy="54" r="2.2" fill="#fff"/>
+  <ellipse class="sombra" cx="70" cy="140" rx="40" ry="5.5" fill="#000" opacity=".12"/>
+  <g stroke="#3A2A22" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round">
+    <g class="rabo">
+      <path d="M90 118 C 122 124 140 104 132 80 C 127 66 112 66 113 78 C 115 90 108 104 88 104 Z" fill="url(#cl-pele)"/>
+      <path d="M118 86 l6 -3 M124 98 l6 0 M116 110 l5 4" stroke="#4E9A2E" stroke-width="2.5"/>
     </g>
-    <circle cx="31" cy="72" r="5.5" fill="#FF9A9A" opacity=".75"/><circle cx="89" cy="72" r="5.5" fill="#FF9A9A" opacity=".75"/>
-    <path class="boca" d="M48 72 Q60 86 72 72 Q60 78 48 72z" fill="#5A1E12" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round"/>
-    <path class="lingua" d="M54 77 Q60 82 66 77" fill="#FF7A7A" stroke="none"/>
+    <g class="pernas">
+      <path d="M48 124 Q40 134 50 136 L62 136 Q66 132 60 124 Z" fill="#5FAE3A"/>
+      <path d="M80 124 Q74 132 78 136 L90 136 Q100 134 92 124 Z" fill="#5FAE3A"/>
+      <path d="M50 136 v-4 M56 136 v-4 M84 136 v-4 M90 136 v-4" stroke-width="2.5"/>
+    </g>
+    <g class="corpo">
+      <ellipse cx="70" cy="100" rx="31" ry="29" fill="url(#cl-pele)"/>
+      <ellipse cx="70" cy="106" rx="19" ry="20" fill="url(#cl-barriga)"/>
+      <path d="M56 98 Q70 102 84 98 M54 108 Q70 112 86 108 M57 118 Q70 121 83 118" fill="none" stroke="#D9B536" stroke-width="2.5"/>
+    </g>
+    <g class="bracos-baixo">
+      <path d="M42 92 Q28 98 30 110 Q34 114 37 110 L36 104 Q40 100 46 100 Z" fill="#6DBB45"/>
+      <path d="M98 92 Q112 98 110 110 Q106 114 103 110 L104 104 Q100 100 94 100 Z" fill="#6DBB45"/>
+    </g>
+    <g class="bracos-cima">
+      <path d="M42 92 Q24 84 24 66 Q28 61 32 66 Q33 80 46 84 Z" fill="#6DBB45"/>
+      <path d="M98 92 Q116 84 116 66 Q112 61 108 66 Q107 80 94 84 Z" fill="#6DBB45"/>
+    </g>
+    <path class="crista" d="M58 26 L63 14 L68 25 L74 12 L79 25 L85 16 L88 28 Z" fill="#F28C28"/>
+    <g class="cabeca">
+      <path d="M28 54 C 28 30 48 22 70 22 C 96 22 114 32 114 54 C 114 74 96 82 70 82 C 46 82 28 74 28 54 Z" fill="url(#cl-pele)"/>
+      <circle cx="96" cy="30" r="3.5" fill="#4E9A2E" stroke="none"/><circle cx="104" cy="40" r="2.5" fill="#4E9A2E" stroke="none"/>
+      <circle cx="40" cy="34" r="3" fill="#4E9A2E" stroke="none"/>
+      <g class="olhos">
+        <ellipse cx="50" cy="44" rx="14" ry="15" fill="#fff"/>
+        <ellipse cx="90" cy="44" rx="14" ry="15" fill="#fff"/>
+        <circle class="pupila" cx="53" cy="47" r="7.5" fill="#2A2A2A" stroke="none"/><circle class="pupila" cx="93" cy="47" r="7.5" fill="#2A2A2A" stroke="none"/>
+        <circle cx="56" cy="43.5" r="2.8" fill="#fff" stroke="none"/><circle cx="96" cy="43.5" r="2.8" fill="#fff" stroke="none"/>
+      </g>
+      <path class="sobrancelha" d="M38 28 Q48 24 58 28 M82 28 Q92 24 102 28" fill="none" stroke-width="3.5"/>
+      <circle cx="36" cy="64" r="6" fill="#FF9A9A" stroke="none" opacity=".7"/><circle cx="104" cy="64" r="6" fill="#FF9A9A" stroke="none" opacity=".7"/>
+      <circle cx="64" cy="60" r="1.6" fill="#3A2A22" stroke="none"/><circle cx="76" cy="60" r="1.6" fill="#3A2A22" stroke="none"/>
+      <g class="boca">
+        <path d="M48 66 Q70 84 92 66 Q70 74 48 66 Z" fill="#5A1E12"/>
+        <path d="M62 75 Q70 79 78 75 Q74 72 70 72 Q66 72 62 75 Z" fill="#FF7A8A" stroke="none"/>
+      </g>
+    </g>
+    <circle cx="52" cy="88" r="3" fill="#4E9A2E" stroke="none"/><circle cx="92" cy="84" r="3.5" fill="#4E9A2E" stroke="none"/>
   </g>
 </svg>`;
 
