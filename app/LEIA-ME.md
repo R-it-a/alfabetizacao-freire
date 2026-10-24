@@ -15,7 +15,7 @@ No Chrome do Android, o menu ⋮ → "Adicionar à tela inicial" instala como ap
 
 O app usa as vozes do próprio celular e escolhe sozinho a melhor em português do Brasil (dá preferência às vozes "naturais" e às do Google, que soam menos robóticas). Na tela inicial, **🔊 Escolher voz** lista as vozes do aparelho para ouvir e trocar. A escolha fica salva.
 
-A qualidade depende do aparelho. Para uma voz realmente humana, as opções são gravar as frases fixas ou usar uma voz neural na nuvem (ver o README do projeto).
+A qualidade depende do aparelho. Para uma voz realmente humana, as opções são gravar as frases fixas com uma pessoa ou usar uma voz neural na nuvem, chamada pelo mesmo Worker do Claude.
 
 ## O que acontece numa sessão
 
