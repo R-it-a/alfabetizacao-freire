@@ -34,15 +34,18 @@ const vozFalsa = () => {
     if (palavra) return palavra;
     return 'não sei';
   };
+  // reconhecimento contínuo: entrega o texto logo e só termina quando mandam parar
   window.SpeechRecognition = class {
     start() {
       setTimeout(() => {
         const texto = responder();
-        this.onresult?.({ results: [[{ transcript: texto, confidence: 0.9 }]] });
-        this.onend?.();
+        const r = [{ transcript: texto, confidence: 0.9 }];
+        r.isFinal = true;
+        this.onresult?.({ resultIndex: 0, results: [r] });
       }, 5);
     }
-    stop() {}
+    stop() { setTimeout(() => this.onend?.(), 5); }
+    abort() { setTimeout(() => this.onend?.(), 5); }
   };
 };
 
@@ -58,6 +61,7 @@ await pagina.goto(URL_APP);
 const silabar = (p) => pagina.evaluate(async (w) => (await import('../codigo/silabador.js')).silabar(w), p);
 const visivel = async (seletor) => (await pagina.locator(seletor).count()) > 0 && pagina.locator(seletor).first().isVisible();
 let prints = 0;
+let lixoTestado = false;
 const print = async (nome) => {
   if (PASTA_PRINTS) await pagina.screenshot({ path: `${PASTA_PRINTS}/${String(++prints).padStart(2, '0')}-${nome}.png`, fullPage: true });
 };
@@ -79,7 +83,23 @@ async function umaSessao(numero) {
     if (await visivel('button.mic')) {
       const tela = (legenda || '').slice(0, 25);
       if (!vistos.has(tela)) { vistos.add(tela); await print(`s${numero}-fala`); }
-      await pagina.click('button.mic');
+      const caixa = await pagina.locator('button.mic').boundingBox();
+      const x = caixa.x + caixa.width / 2;
+      const y = caixa.y + caixa.height / 2;
+      await pagina.mouse.move(x, y);
+      await pagina.mouse.down();
+      await pagina.waitForTimeout(650);
+      if (!lixoTestado) {
+        // arrasta para a esquerda: a gravação vai para a lixeira
+        await pagina.mouse.move(x - 140, y, { steps: 6 });
+        await pagina.waitForTimeout(250);
+        await print(`s${numero}-lixeira`);
+        await pagina.mouse.up();
+        await pagina.waitForFunction(() => /Apaguei/.test(document.getElementById('legenda').textContent));
+        lixoTestado = true;
+        continue;
+      }
+      await pagina.mouse.up();
       continue;
     }
     if (await visivel('.botoes [data-acao="sim"][aria-label="Sim"]')) {
@@ -139,6 +159,7 @@ for (const p of ['bola', 'bala', 'pena']) {
   if (!estado.pastinha.some((x) => x.palavra === p && x.real)) falhas.push(`${p} fora da pastinha`);
 }
 if (!estado.pastinha.some((x) => x.palavra === 'bilubo' && !x.real)) falhas.push('palavra inventada não guardada');
+if (!lixoTestado) falhas.push('lixeira não testada');
 if (erros.length) falhas.push(`erros no console: ${erros.join(' | ')}`);
 
 console.log(JSON.stringify({ palavras: estado.palavras, estagio: estado.estagio, pastinha: estado.pastinha.map((p) => p.palavra), revisar: estado.revisar }, null, 1));

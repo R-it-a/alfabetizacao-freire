@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import * as m from '../metodo.js';
 import { Lexico } from '../lexico.js';
 import { VAZIO, carregar, salvar } from '../estado.js';
+import { combinarTrechos } from '../voz.js';
 
 const lexico = new Lexico(
   readFileSync(fileURLToPath(new URL('../lexico.txt', import.meta.url)), 'utf8').split('\n')
@@ -109,4 +110,13 @@ test('estado sobrevive a JSON corrompido e ganha campos novos', () => {
   assert.deepEqual(e.pastinha, []);
   salvar({ ...e, sessoes: 1 }, memoria);
   assert.equal(carregar(memoria).sessoes, 1);
+});
+
+test('fala longa em vários trechos vira frases alternativas', () => {
+  const trechos = [['hoje eu comi', 'hoje eu comia'], ['bolo de fubá']];
+  assert.deepEqual(combinarTrechos(trechos).map((a) => a.texto), [
+    'hoje eu comi bolo de fubá',
+    'hoje eu comia bolo de fubá'
+  ]);
+  assert.deepEqual(combinarTrechos([]), []);
 });

@@ -5,6 +5,18 @@ Implementação do fluxo descrito em `03-fluxo-da-sessao.html`. HTML e JavaScrip
 **Abrir no celular:** https://r-it-a.github.io/alfabetizacao-freire/app/
 No Chrome do Android, o menu ⋮ → "Adicionar à tela inicial" instala como aplicativo.
 
+## Falar com o app
+
+- **Segurar para falar**, como o áudio do WhatsApp: a pessoa segura o microfone o tempo que precisar (até 1 minuto) e solta para enviar. Pode parar, pensar e continuar: o reconhecimento é religado enquanto o botão estiver apertado.
+- **Lixeira:** com o botão apertado, arrastar para a esquerda e soltar apaga a gravação. Apagar não conta como tentativa.
+- **Toque rápido** em vez de segurar: a voz explica como usar.
+
+## A voz do app
+
+O app usa as vozes do próprio celular e escolhe sozinho a melhor em português do Brasil (dá preferência às vozes "naturais" e às do Google, que soam menos robóticas). Na tela inicial, **🔊 Escolher voz** lista as vozes do aparelho para ouvir e trocar. A escolha fica salva.
+
+A qualidade depende do aparelho. Para uma voz realmente humana, as opções são gravar as frases fixas ou usar uma voz neural na nuvem (ver o README do projeto).
+
 ## O que acontece numa sessão
 
 1. **Motivação** (só na primeira vez): conversa curta sobre cultura.

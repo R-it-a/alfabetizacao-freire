@@ -126,7 +126,27 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ---------------------------------------------------------------- microfone */
 
-.mic-area { display: flex; flex-direction: column; align-items: center; gap: .5rem; min-height: 8rem; }
+.mic-area { display: flex; flex-direction: column; align-items: center; gap: .5rem; min-height: 8rem; width: 100%; }
+
+.gravador {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 8rem;
+}
+
+.lixeira {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  font-size: 2.2rem;
+  opacity: 0;
+  transition: opacity .15s, transform .15s;
+}
+.gravando .lixeira { opacity: .5; }
+.cancelando .lixeira { opacity: 1; transform: scale(1.5); }
 
 .mic {
   width: 7rem;
@@ -139,13 +159,28 @@ button { font: inherit; color: inherit; cursor: pointer; }
   display: grid;
   place-items: center;
   box-shadow: var(--sombra);
+  touch-action: none;             /* o arraste não rola a tela */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;    /* sem menu de toque longo no iPhone */
+  transition: background .15s, transform .08s;
 }
-.mic.ouvindo { animation: pulsar 1.2s ease-in-out infinite; }
+.gravando .mic {
+  background: #C0392B;
+  animation: pulsar 1.2s ease-in-out infinite;
+  width: 8rem;
+  height: 8rem;
+}
+.cancelando .mic { background: var(--texto-2); animation: none; }
 @keyframes pulsar {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--tinta) 45%, transparent); }
-  50% { box-shadow: 0 0 0 18px transparent; }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(192, 57, 43, .45); }
+  50% { box-shadow: 0 0 0 20px transparent; }
 }
-.mic-dica { margin: 0; color: var(--texto-2); font-size: 1.1rem; }
+.mic-dica { margin: 0; color: var(--texto-2); font-size: 1.1rem; text-align: center; }
+.tempo { font-variant-numeric: tabular-nums; font-weight: 700; color: #C0392B; }
+
+.vozes { display: flex; flex-direction: column; gap: .6rem; width: 100%; }
+.voz { font-size: 1.05rem; text-align: left; min-height: 3.5rem; }
 
 .digitar { display: flex; gap: .5rem; width: 100%; }
 .digitar input {

@@ -8,7 +8,10 @@
 
 import { silabar, fichaDescoberta } from '../codigo/silabador.js';
 import { CONFIG } from './config.js';
-import { falar, ouvir, pararDeFalar, reconhecimentoDisponivel } from './voz.js';
+import {
+  falar, gravar, pararDeFalar, reconhecimentoDisponivel,
+  vozesDisponiveis, escolherVoz, vozAtual
+} from './voz.js';
 import { Lexico } from './lexico.js';
 import { carregar, salvar, apagar, hoje } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
@@ -88,13 +91,104 @@ async function lerAcendendo(raiz, silabas, palavra, velocidade) {
 // ================================================================ ouvir a pessoa
 
 /**
+ * Segurar para falar, como o áudio do WhatsApp: a pessoa segura o botão o tempo
+ * que precisar e solta para enviar. Arrastar para a esquerda joga na lixeira.
+ *
+ * @returns {Promise<{alternativas?: object[], erro?: string|null, cancelado?: true, curto?: true}>}
+ */
+function segurarParaFalar(area) {
+  const LIMITE_MS = 60000;   // um minuto por fala
+  const ARRASTE_LIXO = 80;   // pixels para a esquerda
+
+  area.innerHTML = `
+    <div class="gravador">
+      <span class="lixeira" aria-hidden="true">🗑️</span>
+      <button class="mic" aria-label="Segure para falar">🎤</button>
+    </div>
+    <p class="mic-dica">Segure o botão enquanto fala</p>`;
+  const $gravador = area.querySelector('.gravador');
+  const $mic = area.querySelector('.mic');
+  const $dica = area.querySelector('.mic-dica');
+
+  return new Promise((resolve) => {
+    let gravacao = null;
+    let x0 = 0;
+    let inicio = 0;
+    let cancelando = false;
+    let relogio = null;
+
+    $mic.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    $mic.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (gravacao) return;
+      try { $mic.setPointerCapture(e.pointerId); } catch { /* navegador antigo */ }
+      pararDeFalar();
+      navigator.vibrate?.(30);
+      x0 = e.clientX;
+      inicio = Date.now();
+      cancelando = false;
+      gravacao = gravar();
+      $gravador.classList.add('gravando');
+      $dica.innerHTML = '<span class="tempo">0:00</span> · <span class="aviso-lixo">← arraste para apagar</span>';
+      relogio = setInterval(() => {
+        const s = Math.floor((Date.now() - inicio) / 1000);
+        const $tempo = $dica.querySelector('.tempo');
+        if ($tempo) $tempo.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+        if (Date.now() - inicio > LIMITE_MS) soltar();
+      }, 250);
+    });
+
+    $mic.addEventListener('pointermove', (e) => {
+      if (!gravacao) return;
+      const dx = Math.min(0, e.clientX - x0);
+      $mic.style.transform = `translateX(${Math.max(dx, -ARRASTE_LIXO - 15)}px)`;
+      const antes = cancelando;
+      cancelando = dx < -ARRASTE_LIXO;
+      $gravador.classList.toggle('cancelando', cancelando);
+      if (cancelando !== antes) {
+        const $aviso = $dica.querySelector('.aviso-lixo');
+        if ($aviso) $aviso.textContent = cancelando ? 'solte para apagar' : '← arraste para apagar';
+      }
+    });
+
+    async function soltar() {
+      if (!gravacao) return;
+      clearInterval(relogio);
+      const g = gravacao;
+      gravacao = null;
+      $mic.style.transform = '';
+      $gravador.classList.remove('gravando', 'cancelando');
+
+      if (cancelando) {
+        g.cancelar();
+        navigator.vibrate?.([20, 40, 20]);
+        resolve({ cancelado: true });
+        return;
+      }
+      if (Date.now() - inicio < 500) {
+        g.cancelar();
+        resolve({ curto: true });
+        return;
+      }
+      $dica.textContent = 'Entendendo…';
+      resolve(await g.parar());
+    }
+
+    $mic.addEventListener('pointerup', soltar);
+    $mic.addEventListener('pointercancel', () => { cancelando = true; soltar(); });
+  });
+}
+
+/**
  * Mostra o microfone, ouve e devolve as alternativas do reconhecimento.
  * Sem reconhecimento (Firefox, iPhone antigo) mostra um campo de texto, para testar.
  */
 async function ouvirPessoa(raiz) {
   const area = raiz.querySelector('.mic-area');
+  let falhas = 0;
 
-  for (let tentativa = 0; tentativa < 3; tentativa += 1) {
+  while (falhas < 3) {
     if (!reconhecimentoDisponivel()) {
       area.innerHTML = `
         <form class="digitar">
@@ -111,24 +205,31 @@ async function ouvirPessoa(raiz) {
         }, { once: true }));
       area.innerHTML = '';
       if (texto.trim()) return [{ texto, conf: 1 }];
+      falhas += 1;
       continue;
     }
 
-    area.innerHTML = `<button class="mic" data-acao="falar" aria-label="Toque e fale">🎤</button>
-                      <p class="mic-dica">Toque e fale</p>`;
-    await esperarToque(area.querySelector('.mic'));
-    pararDeFalar();
-    area.innerHTML = `<div class="mic ouvindo">🎤</div><p class="mic-dica">Ouvindo…</p>`;
-    const { alternativas, erro } = await ouvir();
-    area.innerHTML = '';
-    if (alternativas.length) return alternativas;
+    const r = await segurarParaFalar(area);
 
-    if (erro === 'not-allowed' || erro === 'service-not-allowed') {
+    if (r.cancelado) {
+      await dizer('Apaguei. Pode falar de novo.');
+      continue; // jogar fora não conta como tentativa
+    }
+    if (r.curto) {
+      await dizer('Segura o botão apertado enquanto fala, e solta quando terminar.');
+      continue;
+    }
+
+    area.innerHTML = '';
+    if (r.alternativas.length) return r.alternativas;
+
+    falhas += 1;
+    if (r.erro === 'not-allowed' || r.erro === 'service-not-allowed') {
       await dizer('Preciso que você deixe o aplicativo usar o microfone.');
-    } else if (erro === 'network') {
+    } else if (r.erro === 'network') {
       await dizer('Estou sem internet para ouvir. Vamos tentar de novo.');
     } else {
-      await dizer('Não ouvi. Toca no microfone e fala de novo.');
+      await dizer('Não ouvi. Segura o botão e fala de novo.');
     }
   }
   return [];
@@ -547,17 +648,43 @@ function pastinha() {
   return esperarToque(raiz.querySelector('[data-acao="voltar"]'));
 }
 
+async function telaVoz() {
+  const vozes = vozesDisponiveis().slice(0, 8);
+  const raiz = mostrar(`
+    <h2>Escolha a voz</h2>
+    <p class="aviso">Toque para ouvir. A voz tocada por último fica escolhida.</p>
+    <div class="vozes">${vozes.map((v, i) => `
+      <button class="btn largo voz ${v.name === vozAtual() ? 'sim' : ''}" data-i="${i}">
+        ${v.name === vozAtual() ? '✓ ' : ''}${esc(v.name)}
+      </button>`).join('') || '<p>Nenhuma voz em português neste aparelho.</p>'}</div>
+    <button class="btn largo" data-acao="voltar">Voltar</button>`);
+
+  raiz.querySelectorAll('.voz').forEach((b) => b.addEventListener('click', async () => {
+    const voz = vozes[Number(b.dataset.i)];
+    escolherVoz(voz.name);
+    raiz.querySelectorAll('.voz').forEach((x) => {
+      const escolhida = x === b;
+      x.classList.toggle('sim', escolhida);
+      x.textContent = `${escolhida ? '✓ ' : ''}${vozes[Number(x.dataset.i)].name}`;
+    });
+    await dizer('Olá! Vamos aprender a ler e escrever juntos?');
+  }));
+  return esperarToque(raiz.querySelector('[data-acao="voltar"]'));
+}
+
 async function inicio() {
   for (;;) {
     const raiz = mostrar(`
       <h1 class="marca">Palavra</h1>
       <button class="btn largo sim comecar" data-acao="comecar">Começar ▶</button>
       <button class="btn largo" data-acao="pastinha">📁 Minha pastinha</button>
+      <button class="btn largo" data-acao="voz">🔊 Escolher voz</button>
       <button class="link" data-acao="zerar">Apagar meu progresso</button>`, 'inicio');
     $legenda.textContent = '';
     const acao = await esperarToque(...raiz.querySelectorAll('[data-acao]'));
 
     if (acao === 'pastinha') { await pastinha(); continue; }
+    if (acao === 'voz') { await telaVoz(); continue; }
     if (acao === 'zerar') {
       const b = mostrar(`<p class="grande">Apagar todo o progresso?</p>
         <div class="botoes"><button class="btn nao" data-acao="sim">Apagar</button>

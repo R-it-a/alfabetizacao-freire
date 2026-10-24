@@ -3,7 +3,7 @@
  * Só ouvir a fala precisa de rede. Troque a versão do cache a cada publicação.
  */
 
-const CACHE = 'palavra-v1';
+const CACHE = 'palavra-v2';
 const ARQUIVOS = [
   './',
   'index.html',
