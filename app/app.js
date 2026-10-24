@@ -15,7 +15,7 @@ import {
 import { Lexico } from './lexico.js';
 import { icone, MASCOTE } from './icones.js';
 import { ilustracao, ILUSTRACOES } from './ilustracoes.js';
-import { tocar, silenciar } from './som.js';
+import { tocar } from './som.js';
 import { carregar, salvar, apagar, hoje, contarDia } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
 import {
@@ -197,7 +197,6 @@ function segurarParaFalar(area) {
       if (gravacao) return;
       try { $mic.setPointerCapture(e.pointerId); } catch { /* navegador antigo */ }
       pararDeFalar();
-      silenciar(); // som ligado atrapalha o microfone no Android
       navigator.vibrate?.(30);
       x0 = e.clientX;
       inicio = Date.now();
@@ -345,78 +344,22 @@ async function praticarLeitura(raiz, silabas, palavra) {
 
 // ================================================================ etapas
 
-/**
- * A fase de motivação (documento 01): antes de qualquer letra, uma conversa
- * sobre cenas do dia a dia até chegar em "tudo o que a gente faz é cultura,
- * então você já sabe muita coisa". É a primeira lição da trilha, separada da
- * primeira palavra, e pode ser revista a qualquer momento.
- */
-const CENAS_CULTURA = [
-  { ilustra: 'natureza',
-    fala: ['Olha essa cena: a árvore, o rio, a pedra, o sol.',
-      'Ninguém fez isso. Já estava aí. Isso é a natureza.'],
-    pergunta: 'O que tem de natureza perto da sua casa?' },
-  { ilustra: 'cultura',
-    fala: ['Agora olha esse pote. Antes ele era barro, e o barro é natureza.',
-      'Uma mulher pegou o barro com as mãos e fez o pote. O que a gente faz com a natureza tem um nome: cultura.'],
-    pergunta: 'Quem você conhece que faz alguma coisa com as mãos?' },
-  { ilustra: 'arco',
-    fala: ['Esse é o arco e a flecha do índio.',
-      'Ele aprendeu a fazer com os mais velhos, olhando e fazendo junto, sem livro. Isso também é cultura.'],
-    pergunta: 'O que você aprendeu com os mais velhos?' },
-  { ilustra: 'espingarda',
-    fala: ['Esse é o caçador com a espingarda.',
-      'A espingarda foi inventada por gente que estudou e escreveu o que sabia. É cultura também, de outro jeito.'],
-    pergunta: 'Um caça com arco, o outro com espingarda. Por que você acha que é assim?' },
-  { ilustra: 'gato',
-    fala: ['E o gato caçando o rato?',
-      'O gato caça, mas ninguém ensinou e ele não inventa nada novo: já nasce sabendo. Isso é natureza.',
-      'A gente é diferente: a gente aprende, inventa e ensina.'],
-    pergunta: 'Qual é a diferença entre o gato e a gente?' },
-  { ilustra: 'cantadores',
-    fala: ['Agora uma viola e um rádio. Dois cantadores inventam verso na hora, sem papel.',
-      'O verso deles é cultura. A música que sai do rádio também.'],
-    pergunta: 'Que música, verso ou história você sabe de cor?' },
-  { ilustra: 'aceno',
-    fala: ['E você?'],
-    pergunta: 'O que você sabe fazer bem?' }
-];
-
-const OBRIGADA = ['Obrigada por me contar.', 'Que bonito.', 'Isso mesmo.', 'Gostei de ouvir.'];
-
 async function motivacao() {
   modoCasa(false);
-  for (let i = 0; i < CENAS_CULTURA.length; i += 1) {
-    const c = CENAS_CULTURA[i];
-    $barra.style.width = `${Math.max(Math.round((i / CENAS_CULTURA.length) * 100), 4)}%`;
-    humor('');
-    const raiz = mostrar(`
-      ${ilustracao(c.ilustra)}
-      <div class="mic-area"></div>`);
-    if (i === 0) await dizer('Antes de começar a ler, quero conversar um pouco com você.');
-    for (const frase of c.fala) await dizer(frase);
-    humor('pensando');
-    await dizer(c.pergunta);
-    await ouvirPessoa(raiz);
-    humor('feliz');
-    if (i < CENAS_CULTURA.length - 1) await dizer(OBRIGADA[i % OBRIGADA.length]);
-  }
-
-  $barra.style.width = '100%';
+  etapa('');
   const raiz = mostrar(`
-    ${ilustracao('trofeu')}
-    <h2 class="titulo-fim">Você já faz cultura!</h2>
-    <button class="btn largo principal" data-acao="seguir">Continuar</button>`, 'fim');
-  humor('comemora');
-  tocar('fim');
-  confete();
-  await dizer('Tudo isso que você me contou é cultura. Então você já sabe muita coisa.');
-  await dizer('Agora a gente vai aprender a escrever o que você já sabe falar. ' +
-    'Na próxima lição vem a primeira palavra.');
+    ${ilustracao('cultura')}
+    <div class="mic-area"></div>`);
+  await dizer('Antes de começar a ler, quero conversar um pouco com você.');
+  await dizer('Pensa em alguém fazendo um bolo, costurando uma roupa ou plantando uma roça. ' +
+    'Tudo isso que a gente faz com as mãos e com a cabeça tem um nome: cultura.');
+  await dizer('Me conta: o que você sabe fazer bem?');
+  await ouvirPessoa(raiz);
+  humor('feliz');
+  await dizer('Isso é cultura. Você já sabe muita coisa. ' +
+    'Agora a gente vai aprender a escrever o que você já sabe falar.');
   estado.cultura_feita = true;
   salvar(estado);
-  await esperarToque(raiz.querySelector('[data-acao="seguir"]'));
-  humor('');
 }
 
 async function abertura() {
@@ -774,8 +717,7 @@ async function fechamento(novas) {
 async function sessao() {
   modoCasa(false);
   etapa('');
-  // a primeira lição é só a conversa sobre cultura; a alfabetização vem depois
-  if (!estado.cultura_feita) { await motivacao(); return; }
+  if (!estado.cultura_feita) await motivacao();
   if (estado.sessoes > 0) await abertura();
 
   const { palavra, debate } = await encontrarPalavra();

@@ -120,7 +120,6 @@ export function gravar() {
   const trechos = [];
   let ativo = true;
   let erro = null;
-  let religadas = 0;
   let rec = null;
   let avisarFim;
   const terminou = new Promise((r) => { avisarFim = r; });
@@ -128,9 +127,7 @@ export function gravar() {
   const ligar = () => {
     rec = new SR();
     rec.lang = 'pt-BR';
-    // contínuo é instável no Android (manual, seção 01): cada trecho é uma
-    // escuta curta, religada enquanto o botão estiver apertado
-    rec.continuous = false;
+    rec.continuous = true;
     rec.interimResults = false;
     rec.maxAlternatives = 3;
 
@@ -141,20 +138,12 @@ export function gravar() {
       }
     };
     rec.onerror = (e) => {
-      // silêncio não é erro: a pessoa ainda está pensando
-      if (e.error === 'no-speech' || e.error === 'aborted') return;
-      // microfone ocupado por um instante: tenta de novo algumas vezes
-      if (e.error === 'audio-capture' && religadas < 3) return;
-      erro = e.error;
+      // silêncio no começo não é erro: a pessoa ainda está pensando
+      if (e.error !== 'no-speech' && e.error !== 'aborted') erro = e.error;
     };
     rec.onend = () => {
-      if (ativo && !erro && religadas < 40) {
-        religadas += 1;
-        setTimeout(() => {
-          if (!ativo) { avisarFim(); return; }
-          try { ligar(); } catch { avisarFim(); }
-        }, 120);
-        return;
+      if (ativo && !erro) {
+        try { ligar(); return; } catch { /* não religou: encerra */ }
       }
       avisarFim();
     };
