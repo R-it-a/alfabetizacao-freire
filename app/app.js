@@ -14,6 +14,7 @@ import {
 } from './voz.js';
 import { Lexico } from './lexico.js';
 import { icone, MASCOTE } from './icones.js';
+import { ilustracao, ILUSTRACOES } from './ilustracoes.js';
 import { tocar } from './som.js';
 import { carregar, salvar, apagar, hoje, contarDia } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
@@ -54,7 +55,13 @@ function humor(nome = '') {
 /** Fala e mostra o texto no balão do mascote. */
 async function dizer(texto, opcoes) {
   ultimaFala = texto;
-  $legenda.textContent = texto;
+  if ($legenda.textContent !== texto) {
+    $legenda.textContent = texto;
+    const balao = $legenda.parentElement;
+    balao.classList.remove('pulo');
+    void balao.offsetWidth; // reinicia a animação
+    balao.classList.add('pulo');
+  }
   const antes = $mascote.className;
   if (!/feliz|comemora/.test(antes)) humor('falando');
   await falar(texto, opcoes);
@@ -116,8 +123,11 @@ function confete() {
 function mostrar(html, classe = '') {
   $tela.className = `tela ${classe}`;
   const conteudo = document.createElement('div');
-  conteudo.className = 'conteudo';
+  conteudo.className = 'conteudo entrando';
   conteudo.innerHTML = html;
+  // cada sílaba, botão e nó da trilha entra um pouco depois do anterior
+  conteudo.querySelectorAll('.sil, .btn, .no, .cena-ilustrada, .placa, .lista-caderno li')
+    .forEach((el, i) => el.style.setProperty('--i', String(Math.min(i, 18))));
   $tela.replaceChildren(conteudo);
   window.scrollTo(0, 0);
   return conteudo;
@@ -337,7 +347,7 @@ async function motivacao() {
   modoCasa(false);
   etapa('');
   const raiz = mostrar(`
-    <div class="icone-grande">${icone('maos')}</div>
+    ${ilustracao('cultura')}
     <div class="mic-area"></div>`);
   await dizer('Antes de começar a ler, quero conversar um pouco com você.');
   await dizer('Pensa em alguém fazendo um bolo, costurando uma roupa ou plantando uma roça. ' +
@@ -358,7 +368,7 @@ async function abertura() {
   const paraLer = [...new Set([...estado.revisar, ...daUltima])].slice(0, 3);
   if (!paraLer.length) return;
 
-  mostrar(`<div class="icone-grande">${icone('aceno')}</div>`);
+  mostrar(ilustracao('aceno'));
   await dizer('Que bom te ver de novo! Vamos ler as palavras da última vez.');
 
   for (const palavra of paraLer) {
@@ -381,7 +391,9 @@ async function abertura() {
 async function encontrarPalavra() {
   etapa('conversa');
   for (let tentativa = 0; tentativa < 3; tentativa += 1) {
-    const raiz = mostrar(`<div class="icone-grande">${icone('conversa')}</div><div class="mic-area"></div>`);
+    const pergunta = perguntaDoDia(estado, tentativa);
+    const cenaPergunta = /comeu|cozinha|feira|prato|cozinhar/.test(pergunta) ? 'comida' : 'conversa';
+    const raiz = mostrar(`${ilustracao(cenaPergunta)}<div class="mic-area"></div>`);
     await dizer(tentativa === 0 ? perguntaDoDia(estado, 0) : `E ${perguntaDoDia(estado, tentativa).toLowerCase()}`);
     const alternativas = await ouvirPessoa(raiz);
     const { candidatas, debate } = await interpretar(alternativas, estado, lexico);
@@ -389,7 +401,7 @@ async function encontrarPalavra() {
     for (const candidata of candidatas.slice(0, 2)) {
       const palavra = candidata.palavra;
       const conf = mostrar(`
-        <div class="icone-grande">${icone('ouvido')}</div>
+        ${ilustracao('ouvido')}
         <div class="botoes">
           <button class="btn sim" data-acao="sim" aria-label="Sim">${icone('certo')}</button>
           <button class="btn nao" data-acao="nao" aria-label="Não">${icone('errado')}</button>
@@ -407,7 +419,7 @@ async function encontrarPalavra() {
 }
 
 async function conversa(palavra, debate) {
-  const raiz = mostrar(`<div class="icone-grande">${icone('conversa')}</div><div class="mic-area"></div>`);
+  const raiz = mostrar(`${ilustracao('conversa')}<div class="mic-area"></div>`);
   await dizer(debate || perguntaDeDebate(palavra));
   await ouvirPessoa(raiz);
   await dizer('Obrigada por me contar.');
@@ -669,7 +681,7 @@ async function caderno(palavra, criadas) {
   etapa('caderno');
   const doDia = [...new Set([palavra, ...criadas.filter((c) => c.real).map((c) => c.palavra)])].slice(0, 4);
   const raiz = mostrar(`
-    <div class="icone-grande">${icone('caderno')}</div>
+    ${ilustracao('caderno')}
     <ul class="lista-caderno">${doDia.map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
     <button class="btn largo principal" data-acao="terminei">Terminei</button>`);
   await dizer('Agora pega o seu caderno e um lápis. Escreve essas palavras, uma embaixo da outra.');
@@ -682,6 +694,7 @@ async function fechamento(novas) {
   etapa('fim');
   const total = estado.pastinha.filter((p) => p.real).length;
   const raiz = mostrar(`
+    ${ilustracao('trofeu')}
     <h2 class="titulo-fim">Lição concluída!</h2>
     <div class="placar">
       <div class="placa ouro"><span>Palavras novas</span><strong>${icone('estrela')}${novas}</strong></div>
@@ -800,8 +813,8 @@ async function inicio() {
         <button class="contador" data-acao="voz" aria-label="Escolher voz">${icone('falar')}</button>
       </div>
       <div class="unidade">
-        <strong>Estágio ${estado.estagio}</strong>
-        <span>Palavras do dia a dia</span>
+        <div><strong>Estágio ${estado.estagio}</strong><span>Palavras do dia a dia</span></div>
+        ${ILUSTRACOES.parede}
       </div>
       ${trilhaHtml()}
       <button class="link" data-acao="zerar">Apagar meu progresso</button>`, 'inicio');
@@ -837,6 +850,16 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 }
 
 Lexico.carregar().then((l) => { lexico = l; }).catch((e) => console.warn(e));
+
+/** Abertura: os tijolos PA LA VRA caem um a um e o Tijolinho aparece. */
+const $abertura = document.getElementById('abertura');
+if ($abertura) {
+  $abertura.querySelector('.abertura-mascote').innerHTML = MASCOTE;
+  const sair = () => { $abertura.classList.add('saindo'); setTimeout(() => $abertura.remove(), 400); };
+  setTimeout(sair, matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1700);
+  $abertura.addEventListener('click', sair, { once: true });
+}
+
 inicio().catch((erro) => {
   console.error(erro);
   mostrar(`<p class="grande">Algo deu errado.</p><pre>${esc(erro.stack || erro)}</pre>`);

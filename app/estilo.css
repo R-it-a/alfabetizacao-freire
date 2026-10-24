@@ -100,7 +100,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   padding: .75rem 1rem 0;
 }
 
-.mascote { width: 5.5rem; flex: none; }
+.mascote { width: 6rem; flex: none; }
 .tijolinho { width: 100%; height: auto; display: block; overflow: visible; }
 .tijolinho .bracos-cima { display: none; }
 .mascote.comemora .bracos-cima { display: inline; }
@@ -435,7 +435,8 @@ button.cel:active { transform: translateY(3px); border-bottom-width: 2px; }
 
 .unidade {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
   padding: 1rem 1.25rem;
   border-radius: var(--raio);
@@ -443,8 +444,10 @@ button.cel:active { transform: translateY(3px); border-bottom-width: 2px; }
   background: var(--verde);
   color: #fff;
 }
+.unidade > div { display: flex; flex-direction: column; }
 .unidade strong { font-size: 1.35rem; font-weight: 900; }
 .unidade span { opacity: .9; }
+.ilustra-parede { width: 5.5rem; height: auto; margin: -.5rem -.25rem -.5rem 0; }
 
 .trilha-licoes {
   display: flex;
@@ -556,6 +559,85 @@ button.cel:active { transform: translateY(3px); border-bottom-width: 2px; }
 .voz { justify-content: flex-start; font-size: 1.05rem; min-height: 3.5rem; text-align: left; }
 
 pre { white-space: pre-wrap; font-size: .8rem; max-width: 100%; overflow: auto; }
+
+/* ---------------------------------------------------------------- ilustrações */
+
+.cena-ilustrada { width: min(15rem, 70vw); }
+.ilustra { width: 100%; height: auto; display: block; overflow: visible; }
+.cena-ilustrada .ilustra { animation: flutuar 3.5s ease-in-out infinite; }
+@keyframes flutuar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* ---------------------------------------------------------------- movimento */
+
+/* a tela nova entra deslizando; cada peça chega um pouco depois da anterior */
+.conteudo.entrando { animation: entrar .35s cubic-bezier(.2, .9, .3, 1) both; }
+@keyframes entrar { from { opacity: 0; transform: translateX(28px); } to { opacity: 1; transform: none; } }
+
+.conteudo.entrando :is(.sil, .btn, .no, .cena-ilustrada, .placa, .lista-caderno li) {
+  animation: chegar .45s cubic-bezier(.3, 1.5, .5, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms + 80ms);
+}
+@keyframes chegar { from { opacity: 0; transform: translateY(18px) scale(.85); } to { opacity: 1; transform: none; } }
+
+/* sílabas da palavra caem como tijolos */
+.conteudo.entrando .palavra .sil { animation-name: cair-tijolo; animation-duration: .55s; }
+@keyframes cair-tijolo {
+  0% { opacity: 0; transform: translateY(-60px) rotate(-8deg); }
+  70% { opacity: 1; transform: translateY(4px) rotate(1deg); }
+  100% { transform: none; }
+}
+
+/* o balão dá um pulinho a cada fala nova */
+.balao.pulo { animation: pulo-balao .3s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes pulo-balao { from { transform: scale(.94); } to { transform: none; } }
+
+/* o mascote respira devagar quando está parado */
+.mascote .tijolinho { animation: respirar 3s ease-in-out infinite; transform-origin: 60px 118px; }
+@keyframes respirar { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.02, .98); } }
+.mascote.falando .tijolinho { animation: balancar .6s ease-in-out infinite alternate; }
+@keyframes balancar { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+.mascote.pensando .sobrancelha { transform: translateY(-3px); }
+.mascote.feliz .sobrancelha, .mascote.comemora .sobrancelha { transform: translateY(-4px); }
+
+/* sílaba acesa dá um pulinho */
+.sil.acesa { animation: acender .3s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes acender { from { transform: scale(.9); } }
+
+/* toque nas peças responde na hora */
+.cel:active, .tecla:active, .btn:active, .bolha:active { filter: brightness(.96); }
+
+/* ---------------------------------------------------------------- abertura do app */
+
+.abertura {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--azul);
+  transition: opacity .35s, transform .35s;
+}
+.abertura.saindo { opacity: 0; transform: scale(1.06); }
+.abertura-mascote { width: 8rem; animation: surgir .6s cubic-bezier(.3, 1.6, .5, 1) .75s both; }
+.abertura-mascote .tijolinho { width: 100%; height: auto; }
+@keyframes surgir { from { opacity: 0; transform: scale(.3) translateY(30px); } to { opacity: 1; transform: none; } }
+.abertura-nome { display: flex; gap: .4rem; }
+.abertura-nome span {
+  padding: .15em .35em .1em;
+  border-radius: 14px;
+  border-bottom: 5px solid var(--ouro-escuro);
+  background: var(--ouro);
+  color: var(--texto);
+  font-size: 2.6rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  animation: cair-tijolo .5s cubic-bezier(.3, 1.4, .5, 1) both;
+}
+.abertura-nome span:nth-child(2) { animation-delay: .15s; background: #fff; border-color: var(--linha-forte); }
+.abertura-nome span:nth-child(3) { animation-delay: .3s; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }

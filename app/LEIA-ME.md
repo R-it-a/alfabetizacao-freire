@@ -7,7 +7,7 @@ No Chrome do Android, o menu ⋮ → "Adicionar à tela inicial" instala como ap
 
 ## Visual
 
-Cara de jogo, para dar vontade de voltar no dia seguinte: tela clara, botões e sílabas com "degrau" (parecem apertáveis), barra de progresso da lição, o **Tijolinho** (um tijolo, porque a gente constrói palavras sílaba por sílaba) falando num balão, aviso verde de acerto e laranja de "quase" subindo da parte de baixo com som, trilha de lições na tela inicial com dias seguidos e comemoração com confete no fim. Nunca aparece vermelho nem "errado".
+Cara de jogo, para dar vontade de voltar no dia seguinte: tela clara, botões e sílabas com "degrau" (parecem apertáveis), barra de progresso da lição, o **Tijolinho** (um tijolo, porque a gente constrói palavras sílaba por sílaba) falando num balão, aviso verde de acerto e laranja de "quase" subindo da parte de baixo com som, trilha de lições na tela inicial com dias seguidos e comemoração com confete no fim. O app abre com os tijolos PA LA VRA caindo, cada tela entra deslizando, as sílabas caem como tijolos e o balão dá um pulinho a cada fala. Nunca aparece vermelho nem "errado".
 
 A conversa sobre cultura é a primeira bolinha da trilha e pode ser revista a qualquer momento.
 
@@ -47,6 +47,7 @@ A qualidade depende do aparelho. Para uma voz realmente humana, as opções são
 | `lexico.js` + `lexico.txt` | Dicionário: 21 mil palavras da lista VERO (LibreOffice) ordenadas por frequência |
 | `voz.js` | Ouvir (Web Speech API) e falar (speechSynthesis) |
 | `icones.js` | Ícones desenhados e o mascote Tijolinho |
+| `ilustracoes.js` | Ilustrações coloridas das telas (cultura, comida, conversa, ouvido, caderno, troféu) |
 | `som.js` | Sons de acerto, de "quase" e de fim de lição |
 | `cerebro.js` | Perguntas e interpretação da fala; chama o Claude se `config.js` tiver o endereço do Worker |
 | `estado.js` | Progresso salvo no celular |

@@ -73,29 +73,40 @@ export const icone = (nome) => ICONES[nome] || '';
  * pensando) é uma classe no elemento que o contém, animada no CSS.
  */
 export const MASCOTE = `
-<svg class="tijolinho" viewBox="0 0 120 120" aria-hidden="true">
-  <g class="bracos-baixo" stroke="#B9472A" stroke-width="7" stroke-linecap="round" fill="none">
-    <path d="M22 70 Q12 78 14 90"/><path d="M98 70 Q108 78 106 90"/>
+<svg class="tijolinho" viewBox="0 0 120 130" aria-hidden="true">
+  <defs>
+    <linearGradient id="tj-corpo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F58A52"/><stop offset="1" stop-color="#E05E2E"/>
+    </linearGradient>
+  </defs>
+  <ellipse class="sombra" cx="60" cy="122" rx="34" ry="5" fill="#000" opacity=".12"/>
+  <g class="bracos-baixo" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round">
+    <path d="M22 66 Q8 76 13 92 Q16 96 20 92 Q18 80 27 74z" fill="#E05E2E"/>
+    <path d="M98 66 Q112 76 107 92 Q104 96 100 92 Q102 80 93 74z" fill="#E05E2E"/>
   </g>
-  <g class="bracos-cima" stroke="#B9472A" stroke-width="7" stroke-linecap="round" fill="none">
-    <path d="M22 62 Q8 50 12 34"/><path d="M98 62 Q112 50 108 34"/>
+  <g class="bracos-cima" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round">
+    <path d="M24 62 Q6 52 10 32 Q14 28 18 32 Q18 48 30 54z" fill="#E05E2E"/>
+    <path d="M96 62 Q114 52 110 32 Q106 28 102 32 Q102 48 90 54z" fill="#E05E2E"/>
   </g>
-  <g class="pernas" fill="#B9472A">
-    <rect x="38" y="96" width="14" height="16" rx="7"/><rect x="68" y="96" width="14" height="16" rx="7"/>
+  <g class="pernas" fill="#B9472A" stroke="#3A2A22" stroke-width="3">
+    <rect x="38" y="98" width="15" height="20" rx="7"/><rect x="67" y="98" width="15" height="20" rx="7"/>
   </g>
-  <g class="corpo">
-    <rect x="18" y="30" width="84" height="72" rx="16" fill="#B9472A"/>
-    <rect x="18" y="26" width="84" height="70" rx="16" fill="#E8693B"/>
-    <path d="M18 50h84M18 74h84M48 26v24M78 50v24M44 74v22M84 74v22" stroke="#F4935F" stroke-width="3" opacity=".8"/>
+  <g class="corpo" stroke="#3A2A22" stroke-width="3.5" stroke-linejoin="round">
+    <rect x="18" y="24" width="84" height="80" rx="18" fill="url(#tj-corpo)"/>
+    <path d="M20 50h80M20 78h80M50 26v24M80 50v28M44 78v24M84 78v24" stroke="#C94E22" stroke-width="2.5" opacity=".55"/>
+    <path d="M30 32 Q34 28 46 29" fill="none" stroke="#FFD3B8" stroke-width="4" opacity=".9"/>
   </g>
   <g class="rosto">
+    <path class="sobrancelha" d="M34 40 Q43 35 52 39 M68 39 Q77 35 86 40" fill="none" stroke="#3A2A22" stroke-width="3.5" stroke-linecap="round"/>
     <g class="olhos">
-      <circle cx="44" cy="54" r="11" fill="#fff"/><circle cx="76" cy="54" r="11" fill="#fff"/>
-      <circle class="pupila" cx="46" cy="55" r="5.5" fill="#2A2A2A"/><circle class="pupila" cx="78" cy="55" r="5.5" fill="#2A2A2A"/>
-      <circle cx="48" cy="52.5" r="1.8" fill="#fff"/><circle cx="80" cy="52.5" r="1.8" fill="#fff"/>
+      <ellipse cx="44" cy="55" rx="11" ry="12" fill="#fff" stroke="#3A2A22" stroke-width="3"/>
+      <ellipse cx="76" cy="55" rx="11" ry="12" fill="#fff" stroke="#3A2A22" stroke-width="3"/>
+      <circle class="pupila" cx="46" cy="57" r="6" fill="#2A2A2A"/><circle class="pupila" cx="78" cy="57" r="6" fill="#2A2A2A"/>
+      <circle cx="48.5" cy="54" r="2.2" fill="#fff"/><circle cx="80.5" cy="54" r="2.2" fill="#fff"/>
     </g>
-    <circle cx="32" cy="70" r="5" fill="#F7A0A0" opacity=".8"/><circle cx="88" cy="70" r="5" fill="#F7A0A0" opacity=".8"/>
-    <path class="boca" d="M50 72 Q60 82 70 72 Q60 76 50 72z" fill="#5A1E12" stroke="#5A1E12" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="31" cy="72" r="5.5" fill="#FF9A9A" opacity=".75"/><circle cx="89" cy="72" r="5.5" fill="#FF9A9A" opacity=".75"/>
+    <path class="boca" d="M48 72 Q60 86 72 72 Q60 78 48 72z" fill="#5A1E12" stroke="#3A2A22" stroke-width="3" stroke-linejoin="round"/>
+    <path class="lingua" d="M54 77 Q60 82 66 77" fill="#FF7A7A" stroke="none"/>
   </g>
 </svg>`;
 

@@ -64,6 +64,7 @@ const visivel = async (seletor) => (await pagina.locator(seletor).count()) > 0 &
 let prints = 0;
 let lixoTestado = false;
 const print = async (nome) => {
+  if (PASTA_PRINTS) await pagina.waitForTimeout(900);
   if (PASTA_PRINTS) await pagina.screenshot({ path: `${PASTA_PRINTS}/${String(++prints).padStart(2, '0')}-${nome}.png`, fullPage: true });
 };
 

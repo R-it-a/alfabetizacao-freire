@@ -4,7 +4,7 @@
  * quando não há. Só ouvir a fala precisa de rede.
  */
 
-const CACHE = 'palavra-v4';
+const CACHE = 'palavra-v5';
 const ARQUIVOS = [
   './',
   'index.html',
@@ -18,6 +18,7 @@ const ARQUIVOS = [
   'cerebro.js',
   'icones.js',
   'som.js',
+  'ilustracoes.js',
   'lexico.txt',
   'manifest.json',
   'icones/icone-192.png',
