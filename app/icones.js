@@ -66,3 +66,42 @@ export const ICONES = {
 };
 
 export const icone = (nome) => ICONES[nome] || '';
+
+/**
+ * O Tijolinho, mascote do app: um tijolo, porque a gente constrói palavras
+ * sílaba por sílaba, como uma parede. O estado (falando, feliz, comemora,
+ * pensando) é uma classe no elemento que o contém, animada no CSS.
+ */
+export const MASCOTE = `
+<svg class="tijolinho" viewBox="0 0 120 120" aria-hidden="true">
+  <g class="bracos-baixo" stroke="#B9472A" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M22 70 Q12 78 14 90"/><path d="M98 70 Q108 78 106 90"/>
+  </g>
+  <g class="bracos-cima" stroke="#B9472A" stroke-width="7" stroke-linecap="round" fill="none">
+    <path d="M22 62 Q8 50 12 34"/><path d="M98 62 Q112 50 108 34"/>
+  </g>
+  <g class="pernas" fill="#B9472A">
+    <rect x="38" y="96" width="14" height="16" rx="7"/><rect x="68" y="96" width="14" height="16" rx="7"/>
+  </g>
+  <g class="corpo">
+    <rect x="18" y="30" width="84" height="72" rx="16" fill="#B9472A"/>
+    <rect x="18" y="26" width="84" height="70" rx="16" fill="#E8693B"/>
+    <path d="M18 50h84M18 74h84M48 26v24M78 50v24M44 74v22M84 74v22" stroke="#F4935F" stroke-width="3" opacity=".8"/>
+  </g>
+  <g class="rosto">
+    <g class="olhos">
+      <circle cx="44" cy="54" r="11" fill="#fff"/><circle cx="76" cy="54" r="11" fill="#fff"/>
+      <circle class="pupila" cx="46" cy="55" r="5.5" fill="#2A2A2A"/><circle class="pupila" cx="78" cy="55" r="5.5" fill="#2A2A2A"/>
+      <circle cx="48" cy="52.5" r="1.8" fill="#fff"/><circle cx="80" cy="52.5" r="1.8" fill="#fff"/>
+    </g>
+    <circle cx="32" cy="70" r="5" fill="#F7A0A0" opacity=".8"/><circle cx="88" cy="70" r="5" fill="#F7A0A0" opacity=".8"/>
+    <path class="boca" d="M50 72 Q60 82 70 72 Q60 76 50 72z" fill="#5A1E12" stroke="#5A1E12" stroke-width="2.5" stroke-linejoin="round"/>
+  </g>
+</svg>`;
+
+ICONES.cadeado = svg(`
+  <rect x="11" y="21" width="26" height="20" rx="4" fill="currentColor"/><path d="M17 21v-6a7 7 0 0 1 14 0v6"/>`);
+ICONES.fogo = svg(`
+  <path d="M24 44c-8 0-14-6-14-14 0-9 8-13 9-22 4 3 7 8 7 13 2-2 3-4 3-7 5 4 9 10 9 16 0 8-6 14-14 14z" fill="currentColor"/>`);
+ICONES.fechar = svg('<path d="M13 13l22 22M35 13L13 35" stroke-width="4.5"/>');
+ICONES.estrela = svg('<path d="M24 5l5.6 12 13 1.4-9.8 8.8 2.8 12.8L24 33.5 12.4 40l2.8-12.8L5.4 18.4l13-1.4z" fill="currentColor"/>');

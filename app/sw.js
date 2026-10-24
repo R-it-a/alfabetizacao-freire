@@ -1,9 +1,10 @@
 /**
  * Guarda o app no celular para abrir sem internet (manual, seção 04).
- * Só ouvir a fala precisa de rede. Troque a versão do cache a cada publicação.
+ * Busca sempre a versão nova quando há internet; a cópia guardada é só para
+ * quando não há. Só ouvir a fala precisa de rede.
  */
 
-const CACHE = 'palavra-v3';
+const CACHE = 'palavra-v4';
 const ARQUIVOS = [
   './',
   'index.html',
@@ -16,6 +17,7 @@ const ARQUIVOS = [
   'estado.js',
   'cerebro.js',
   'icones.js',
+  'som.js',
   'lexico.txt',
   'manifest.json',
   'icones/icone-192.png',
@@ -54,5 +56,18 @@ self.addEventListener('fetch', (e) => {
   }
 
   if (origem !== location.origin) return;
-  e.respondWith(caches.match(e.request).then((salvo) => salvo || fetch(e.request)));
+
+  // rede primeiro: com internet a pessoa sempre recebe a versão mais nova;
+  // sem internet, usa a cópia guardada
+  e.respondWith(
+    fetch(e.request)
+      .then((resposta) => {
+        if (resposta.ok) {
+          const copia = resposta.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copia));
+        }
+        return resposta;
+      })
+      .catch(() => caches.match(e.request))
+  );
 });

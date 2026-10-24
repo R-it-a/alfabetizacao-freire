@@ -14,6 +14,7 @@ export const VAZIO = Object.freeze({
   pastinha: [],               // { palavra, real, data, geradora }
   revisar: [],                // palavras que passaram de duas tentativas
   sessoes: 0,
+  diasSeguidos: 0,             // dias seguidos com sessão
   ultimaSessao: null,         // 'AAAA-MM-DD'
   motivacao_feita: false,
   explicou_palavras_mortas: false
@@ -49,3 +50,11 @@ export function apagar(armazenamento = globalThis.localStorage) {
 }
 
 export const hoje = () => new Date().toISOString().slice(0, 10);
+
+/** Atualiza os dias seguidos ao terminar uma sessão. */
+export function contarDia(estado, dia = hoje()) {
+  if (estado.ultimaSessao === dia) return estado.diasSeguidos || 1;
+  const ontem = new Date(new Date(`${dia}T12:00:00Z`).getTime() - 864e5).toISOString().slice(0, 10);
+  estado.diasSeguidos = estado.ultimaSessao === ontem ? (estado.diasSeguidos || 0) + 1 : 1;
+  return estado.diasSeguidos;
+}

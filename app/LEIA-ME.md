@@ -5,6 +5,12 @@ Implementação do fluxo descrito em `03-fluxo-da-sessao.html`. HTML e JavaScrip
 **Abrir no celular:** https://r-it-a.github.io/alfabetizacao-freire/app/
 No Chrome do Android, o menu ⋮ → "Adicionar à tela inicial" instala como aplicativo.
 
+## Visual
+
+Cara de jogo, para dar vontade de voltar no dia seguinte: tela clara, botões e sílabas com "degrau" (parecem apertáveis), barra de progresso da lição, o **Tijolinho** (um tijolo, porque a gente constrói palavras sílaba por sílaba) falando num balão, aviso verde de acerto e laranja de "quase" subindo da parte de baixo com som, trilha de lições na tela inicial com dias seguidos e comemoração com confete no fim. Nunca aparece vermelho nem "errado".
+
+A conversa sobre cultura é a primeira bolinha da trilha e pode ser revista a qualquer momento.
+
 ## Falar com o app
 
 - **Segurar para falar**, como o áudio do WhatsApp: a pessoa segura o microfone o tempo que precisar (até 1 minuto) e solta para enviar. Pode parar, pensar e continuar: o reconhecimento é religado enquanto o botão estiver apertado.
@@ -40,6 +46,8 @@ A qualidade depende do aparelho. Para uma voz realmente humana, as opções são
 | `metodo.js` | Regras do método em código: estágios, famílias, escolha da palavra, conferência da fala e da escrita |
 | `lexico.js` + `lexico.txt` | Dicionário: 21 mil palavras da lista VERO (LibreOffice) ordenadas por frequência |
 | `voz.js` | Ouvir (Web Speech API) e falar (speechSynthesis) |
+| `icones.js` | Ícones desenhados e o mascote Tijolinho |
+| `som.js` | Sons de acerto, de "quase" e de fim de lição |
 | `cerebro.js` | Perguntas e interpretação da fala; chama o Claude se `config.js` tiver o endereço do Worker |
 | `estado.js` | Progresso salvo no celular |
 | `config.js` | Endereço do Worker, velocidade da voz, número de tentativas |

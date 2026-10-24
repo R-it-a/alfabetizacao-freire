@@ -143,7 +143,7 @@ async function umaSessao(numero) {
   throw new Error(`Sessão ${numero} não terminou. Última fala: ${await pagina.locator('#legenda').textContent()}`);
 }
 
-await pagina.waitForSelector('.comecar');
+await pagina.waitForSelector(".comecar");
 await print('inicio');
 await umaSessao(1);
 await umaSessao(2);

@@ -13,8 +13,9 @@ import {
   vozesDisponiveis, escolherVoz, vozAtual
 } from './voz.js';
 import { Lexico } from './lexico.js';
-import { icone } from './icones.js';
-import { carregar, salvar, apagar, hoje } from './estado.js';
+import { icone, MASCOTE } from './icones.js';
+import { tocar } from './som.js';
+import { carregar, salvar, apagar, hoje, contarDia } from './estado.js';
 import { interpretar, perguntaDoDia, perguntaDeDebate } from './cerebro.js';
 import {
   compactar, conferirFala, conferirFamilia, conferirEscrita,
@@ -24,6 +25,11 @@ import {
 const $tela = document.getElementById('tela');
 const $legenda = document.getElementById('legenda');
 const $repetir = document.getElementById('repetir');
+const $fechar = document.getElementById('fechar');
+const $barra = document.getElementById('barra');
+const $mascote = document.getElementById('mascote');
+const $aviso = document.getElementById('aviso');
+const $confete = document.getElementById('confete');
 
 let lexico = null;
 let estado = carregar();
@@ -38,23 +44,69 @@ const elogio = () => ELOGIOS[elogioAtual++ % ELOGIOS.length];
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Fala e mostra o texto como legenda. */
+$mascote.innerHTML = MASCOTE;
+
+/** O humor do Tijolinho: normal, falando, feliz, comemora ou pensando. */
+function humor(nome = '') {
+  $mascote.className = `mascote ${nome}`;
+}
+
+/** Fala e mostra o texto no balão do mascote. */
 async function dizer(texto, opcoes) {
   ultimaFala = texto;
   $legenda.textContent = texto;
+  const antes = $mascote.className;
+  if (!/feliz|comemora/.test(antes)) humor('falando');
   await falar(texto, opcoes);
+  if (!/feliz|comemora/.test(antes)) humor('');
 }
 
-$repetir.innerHTML = `${icone('falar')}<span>Ouvir de novo</span>`;
+$repetir.innerHTML = icone('falar');
 $repetir.addEventListener('click', () => falar(ultimaFala));
+$fechar.innerHTML = icone('fechar');
+$fechar.addEventListener('click', () => {
+  pararDeFalar();
+  location.reload(); // o progresso já está salvo; volta para a trilha
+});
 
-/** A trilha no topo mostra em que parte da sessão a pessoa está. */
+/** A barra de progresso no topo mostra quanto da lição já foi. */
 const ETAPAS = ['conversa', 'palavra', 'familias', 'ficha', 'criar', 'teclado', 'caderno'];
-const $trilha = document.getElementById('trilha');
 function etapa(nome) {
-  const atual = ETAPAS.indexOf(nome);
-  $trilha.innerHTML = atual < 0 ? '' : ETAPAS.map((_, i) =>
-    `<li class="${i < atual ? 'feita' : i === atual ? 'atual' : ''}"></li>`).join('');
+  const i = ETAPAS.indexOf(nome);
+  const pct = nome === 'fim' ? 100 : i < 0 ? 0 : Math.round((i / ETAPAS.length) * 100);
+  $barra.style.width = `${Math.max(pct, 4)}%`;
+  $barra.parentElement.setAttribute('aria-valuenow', String(pct));
+}
+
+const modoCasa = (sim) => document.body.classList.toggle('em-casa', sim);
+
+/**
+ * O aviso que sobe da parte de baixo da tela: verde quando acerta, laranja
+ * quando falta pouco. Nunca vermelho, e nunca "errado" (fluxo da sessão, seção 03).
+ */
+async function avisar(tipo, texto) {
+  tocar(tipo === 'certo' ? 'certo' : 'quase');
+  navigator.vibrate?.(tipo === 'certo' ? 40 : [30, 60, 30]);
+  $aviso.className = `aviso-baixo ${tipo}`;
+  $aviso.innerHTML = `<span class="aviso-icone">${icone(tipo === 'certo' ? 'certo' : 'ideia')}</span><strong>${esc(texto)}</strong>`;
+  $aviso.hidden = false;
+  requestAnimationFrame(() => $aviso.classList.add('visivel'));
+  humor(tipo === 'certo' ? 'feliz' : 'pensando');
+  await dizer(texto);
+  await espera(250);
+  $aviso.classList.remove('visivel');
+  await espera(200);
+  $aviso.hidden = true;
+  humor('');
+}
+
+/** Chuva de confete para fechar a lição. */
+function confete() {
+  const cores = ['#FFC233', '#2F6FEB', '#43B05C', '#E8693B', '#F28C28'];
+  $confete.innerHTML = Array.from({ length: 40 }, (_, i) =>
+    `<i style="left:${Math.random() * 100}%;background:${cores[i % cores.length]};animation-delay:${Math.random() * 0.6}s;--giro:${Math.random() * 720 - 360}deg"></i>`
+  ).join('');
+  setTimeout(() => { $confete.innerHTML = ''; }, 3500);
 }
 
 /**
@@ -262,18 +314,18 @@ async function praticarLeitura(raiz, silabas, palavra) {
 
     if (r.ok) {
       spans.forEach((s) => s.classList.add('certa'));
-      await dizer(elogio());
+      await avisar('certo', elogio());
       spans.forEach((s) => s.classList.remove('certa'));
       return true;
     }
 
     r.erradas.forEach((i) => spans[i]?.classList.add('atencao'));
-    await dizer('Vamos devagar.');
+    await avisar('quase', 'Quase! Vamos devagar.');
     await lerAcendendo(raiz, silabas, palavra, CONFIG.velocidadeModelo);
     spans.forEach((s) => s.classList.remove('atencao'));
   }
 
-  await dizer('Tudo bem, a gente volta nela na próxima vez.');
+  await avisar('quase', 'Tudo bem, a gente volta nela na próxima vez.');
   if (!estado.revisar.includes(palavra)) estado.revisar.push(palavra);
   salvar(estado);
   return false;
@@ -282,6 +334,8 @@ async function praticarLeitura(raiz, silabas, palavra) {
 // ================================================================ etapas
 
 async function motivacao() {
+  modoCasa(false);
+  etapa('');
   const raiz = mostrar(`
     <div class="icone-grande">${icone('maos')}</div>
     <div class="mic-area"></div>`);
@@ -290,6 +344,7 @@ async function motivacao() {
     'Tudo isso que a gente faz com as mãos e com a cabeça tem um nome: cultura.');
   await dizer('Me conta: o que você sabe fazer bem?');
   await ouvirPessoa(raiz);
+  humor('feliz');
   await dizer('Isso é cultura. Você já sabe muita coisa. ' +
     'Agora a gente vai aprender a escrever o que você já sabe falar.');
   estado.motivacao_feita = true;
@@ -312,7 +367,7 @@ async function abertura() {
     await dizer('Lê pra mim essa palavra.');
     const alternativas = await ouvirPessoa(raiz);
     if (conferirFala(alternativas, silabas).ok) {
-      await dizer(`${elogio()} ${palavra}.`);
+      await avisar('certo', `${elogio()} ${palavra}.`);
       estado.revisar = estado.revisar.filter((p) => p !== palavra);
     } else {
       await praticarLeitura(raiz, silabas, palavra);
@@ -395,9 +450,9 @@ async function familias(palavra) {
     await dizer(`Fala comigo: ${f.linha.join(', ')}.`);
     const alternativas = await ouvirPessoa(raiz);
     if (conferirFamilia(alternativas, f.linha)) {
-      await dizer(elogio());
+      await avisar('certo', elogio());
     } else {
-      await dizer('Vamos devagar.');
+      await avisar('quase', 'Quase! Vamos devagar.');
       for (const s of f.linha) await dizer(s, { velocidade: CONFIG.velocidadeModelo });
     }
   }
@@ -480,6 +535,7 @@ async function fichaCriar(palavra) {
       if (alvo.classList.contains('cel')) {
         montagem.push(alvo.dataset.s);
         atualizar();
+        tocar('toque');
         falar(alvo.dataset.s);
         return;
       }
@@ -512,7 +568,7 @@ async function fichaCriar(palavra) {
           atualizar();
           $criadas.insertAdjacentHTML('beforeend', `<span class="chip">${esc(item.palavra)}</span>`);
           $terminei.hidden = false;
-          await dizer(`${elogio()} ${item.palavra}.`);
+          await avisar('certo', `${elogio()} ${item.palavra}.`);
           if (!item.real && estado.sessoes >= 3) {
             await dizer('Essa palavra a gente inventou agora. As outras, a gente usa todo dia.');
             estado.explicou_palavras_mortas = true;
@@ -572,6 +628,7 @@ async function teclado(palavra, criadas) {
         if (b.classList.contains('tecla')) {
           digitadas.push(b.dataset.s);
           atualizar();
+          tocar('toque');
           falar(b.dataset.s);
           return;
         }
@@ -582,7 +639,7 @@ async function teclado(palavra, criadas) {
         const r = conferirEscrita(digitadas, silabasAlvo);
         if (r.ok) {
           $escrita.classList.add('certa');
-          await dizer(`${elogio()} Você escreveu ${alvo}.`);
+          await avisar('certo', `${elogio()} Você escreveu ${alvo}.`);
           resolve(true);
           return;
         }
@@ -595,7 +652,7 @@ async function teclado(palavra, criadas) {
           return;
         }
         tentativa += 1;
-        await dizer(`Quase. ${alvo} é assim:`);
+        await avisar('quase', `Quase! ${alvo} é assim:`);
         for (const s of silabasAlvo) await dizer(s, { velocidade: CONFIG.velocidadeModelo });
         await dizer('Tenta de novo.');
         digitadas = [];
@@ -621,21 +678,31 @@ async function caderno(palavra, criadas) {
   await dizer('Muito bem. Da próxima vez você lê pra mim o que escreveu.');
 }
 
-async function fechamento() {
-  etapa('');
+async function fechamento(novas) {
+  etapa('fim');
   const total = estado.pastinha.filter((p) => p.real).length;
   const raiz = mostrar(`
-    <div class="icone-grande">${icone('broto')}</div>
-    <p class="grande">${total} ${total === 1 ? 'palavra' : 'palavras'} na sua pastinha</p>
-    <button class="btn largo" data-acao="inicio">Voltar ao início</button>`);
+    <h2 class="titulo-fim">Lição concluída!</h2>
+    <div class="placar">
+      <div class="placa ouro"><span>Palavras novas</span><strong>${icone('estrela')}${novas}</strong></div>
+      <div class="placa laranja"><span>Dias seguidos</span><strong>${icone('fogo')}${estado.diasSeguidos}</strong></div>
+      <div class="placa azul"><span>Na pastinha</span><strong>${icone('pasta')}${total}</strong></div>
+    </div>
+    <button class="btn largo principal" data-acao="inicio">Continuar</button>`, 'fim');
+  humor('comemora');
+  tocar('fim');
+  confete();
   await dizer(`Você já tem ${total} ${total === 1 ? 'palavra' : 'palavras'} na sua pastinha. ` +
     'Em casa, tenta formar mais palavras com as sílabas de hoje. Até a próxima!');
   await esperarToque(raiz.querySelector('[data-acao="inicio"]'));
+  humor('');
 }
 
 // ================================================================ sessão
 
 async function sessao() {
+  modoCasa(false);
+  etapa('');
   if (!estado.motivacao_feita) await motivacao();
   if (estado.sessoes > 0) await abertura();
 
@@ -650,10 +717,11 @@ async function sessao() {
 
   registrarPalavraGeradora(estado, palavra);
   estado.sessoes += 1;
+  contarDia(estado);
   estado.ultimaSessao = hoje();
   salvar(estado);
 
-  await fechamento();
+  await fechamento(criadas.filter((c) => c.real).length);
 }
 
 function pastinha() {
@@ -691,24 +759,61 @@ async function telaVoz() {
   return esperarToque(raiz.querySelector('[data-acao="voltar"]'));
 }
 
+/** A trilha de lições: cultura, as palavras já trabalhadas, a próxima e as que vêm. */
+function trilhaHtml() {
+  const nos = [];
+  if (estado.motivacao_feita) {
+    nos.push(`<li class="no feito">
+      <button class="bolha" data-acao="cultura" aria-label="Rever a conversa sobre cultura">${icone('maos')}</button>
+      <span class="rotulo">cultura</span></li>`);
+  } else {
+    // na primeira vez, a lição começa pela conversa sobre cultura
+    nos.push(`<li class="no atual">
+      <span class="comece">Começar</span>
+      <button class="bolha comecar" data-acao="comecar" aria-label="Começar">${icone('maos')}</button>
+      <span class="rotulo">cultura</span></li>`);
+  }
+  estado.palavras.forEach((p) => nos.push(`<li class="no feito">
+      <button class="bolha" data-p="${esc(p)}" aria-label="Ouvir ${esc(p)}">${icone('certo')}</button>
+      <span class="rotulo">${esc(p)}</span></li>`));
+  if (estado.motivacao_feita) {
+    nos.push(`<li class="no atual">
+      <span class="comece">Começar</span>
+      <button class="bolha comecar" data-acao="comecar" aria-label="Começar a próxima lição">${icone('estrela')}</button></li>`);
+  }
+  for (let i = 0; i < 3; i += 1) {
+    nos.push(`<li class="no trancado"><span class="bolha">${icone('cadeado')}</span></li>`);
+  }
+  return `<ol class="trilha-licoes">${nos.join('')}</ol>`;
+}
+
 async function inicio() {
   for (;;) {
+    modoCasa(true);
+    humor('');
+    const total = estado.pastinha.filter((p) => p.real).length;
     const raiz = mostrar(`
-      <h1 class="marca" aria-label="Palavra">
-        <span class="sil">pa</span><span class="sil">la</span><span class="sil">vra</span>
-      </h1>
-      <button class="btn largo principal comecar" data-acao="comecar">${icone('comecar')} Começar</button>
-      <div class="secundarios">
-        <button class="btn" data-acao="pastinha">${icone('pasta')} Minha pastinha</button>
-        <button class="btn" data-acao="voz">${icone('falar')} Escolher voz</button>
+      <div class="painel">
+        <span class="marca">Palavra</span>
+        <span class="contador laranja" title="Dias seguidos">${icone('fogo')}${estado.diasSeguidos || 0}</span>
+        <button class="contador azul" data-acao="pastinha" aria-label="Minha pastinha">${icone('pasta')}${total}</button>
+        <button class="contador" data-acao="voz" aria-label="Escolher voz">${icone('falar')}</button>
       </div>
+      <div class="unidade">
+        <strong>Estágio ${estado.estagio}</strong>
+        <span>Palavras do dia a dia</span>
+      </div>
+      ${trilhaHtml()}
       <button class="link" data-acao="zerar">Apagar meu progresso</button>`, 'inicio');
     $legenda.textContent = '';
-    etapa('');
+    raiz.querySelector('.comecar')?.scrollIntoView({ block: 'center' });
+    raiz.querySelectorAll('[data-p]').forEach((b) => b.addEventListener('click', () => dizer(b.dataset.p)));
+
     const acao = await esperarToque(...raiz.querySelectorAll('[data-acao]'));
 
-    if (acao === 'pastinha') { await pastinha(); continue; }
-    if (acao === 'voz') { await telaVoz(); continue; }
+    if (acao === 'pastinha') { modoCasa(false); await pastinha(); continue; }
+    if (acao === 'voz') { modoCasa(false); await telaVoz(); continue; }
+    if (acao === 'cultura') { await motivacao(); continue; }
     if (acao === 'zerar') {
       const b = mostrar(`<p class="grande">Apagar todo o progresso?</p>
         <div class="botoes"><button class="btn nao" data-acao="sim">Apagar</button>
