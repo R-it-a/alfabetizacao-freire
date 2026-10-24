@@ -9,6 +9,7 @@ Material produzido em 04/08/2026.
 | `plano-alfabetizacao-freire.pdf` | **Comece por aqui.** 2 páginas: mind map da arquitetura em 5 camadas, pilha de ferramentas com custo de cada uma, conceitos fundamentais e ordem de construção. |
 | `01-especificacao-do-metodo.html` | O método Freire destilado das fontes primárias e traduzido em arquitetura: protocolo de 9 quadros por palavra, grade fonética de Angicos, algoritmo de seleção da palavra geradora. Tem a ficha da descoberta interativa. |
 | `02-manual-das-ferramentas.html` | Como cada uma das 7 ferramentas funciona por dentro: mecânica, código mínimo, e o que dá errado. Tem demos ao vivo de reconhecimento e síntese de fala. |
+| `03-fluxo-da-sessao.html` | O passo a passo de uma sessão: pergunta, conversa, palavra geradora, repetição com correção, ficha da descoberta, teclado de sílabas e caderno. Registra as decisões de produto e o que ainda está em aberto. |
 | `gerar-pdf.py` | Script que gera o PDF. Rode `python gerar-pdf.py` para regerar depois de editar. Precisa de `reportlab==3.6.13`. |
 
 ## Fontes primárias (`fontes/`)

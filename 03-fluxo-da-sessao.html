@@ -1,0 +1,870 @@
+<title>Fluxo da sessão</title>
+
+<style>
+  :root {
+    --ground:      #F2F4F7;
+    --ground-2:    #FFFFFF;
+    --ground-3:    #E4E8EF;
+    --rule:        #C9D1DE;
+    --text:        #161B24;
+    --text-2:      #4A5464;
+    --text-3:      #6E7889;
+    --ink:         #1B3A6B;
+    --ink-soft:    #E3EAF6;
+    --luz:         #A8741A;
+    --luz-soft:    #F6EBD5;
+    --shadow:      0 1px 2px rgba(22,27,36,.06), 0 8px 24px -12px rgba(22,27,36,.18);
+
+    --f-display: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    --f-body:    ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --f-mono:    ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+    --measure: 34rem;
+    --wide: 64rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:   #0E131C;
+      --ground-2: #151C28;
+      --ground-3: #1D2634;
+      --rule:     #2C3849;
+      --text:     #E8ECF3;
+      --text-2:   #AEB9C9;
+      --text-3:   #7E8B9D;
+      --ink:      #8CB0EC;
+      --ink-soft: #182740;
+      --luz:      #E0AE55;
+      --luz-soft: #2A2214;
+      --shadow:   0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:   #0E131C;
+    --ground-2: #151C28;
+    --ground-3: #1D2634;
+    --rule:     #2C3849;
+    --text:     #E8ECF3;
+    --text-2:   #AEB9C9;
+    --text-3:   #7E8B9D;
+    --ink:      #8CB0EC;
+    --ink-soft: #182740;
+    --luz:      #E0AE55;
+    --luz-soft: #2A2214;
+    --shadow:   0 1px 2px rgba(0,0,0,.4), 0 10px 30px -14px rgba(0,0,0,.7);
+  }
+
+  :root[data-theme="light"] {
+    --ground:      #F2F4F7;
+    --ground-2:    #FFFFFF;
+    --ground-3:    #E4E8EF;
+    --rule:        #C9D1DE;
+    --text:        #161B24;
+    --text-2:      #4A5464;
+    --text-3:      #6E7889;
+    --ink:         #1B3A6B;
+    --ink-soft:    #E3EAF6;
+    --luz:         #A8741A;
+    --luz-soft:    #F6EBD5;
+    --shadow:      0 1px 2px rgba(22,27,36,.06), 0 8px 24px -12px rgba(22,27,36,.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { overflow-x: hidden; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--text);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.65;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: var(--wide);
+    margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 3rem);
+  }
+
+  .col { max-width: var(--measure); }
+
+  /* min-width:auto é o default em grid/flex items: sem isto, um <pre> ou uma
+     tabela de linha longa se recusa a encolher e estoura a página inteira. */
+  .grid > *, .grid-2 > *, .split > *,
+  .stack > *, .stack-s > *, .stack-l > * { min-width: 0; }
+
+  /* ---------- type ---------- */
+
+  h1, h2, h3, h4 { font-family: var(--f-display); text-wrap: balance; margin: 0; }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    line-height: 1.02;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+    font-weight: 750;
+    letter-spacing: -.028em;
+    line-height: 1.1;
+  }
+
+  h3 {
+    font-size: 1.16rem;
+    font-weight: 700;
+    letter-spacing: -.012em;
+    line-height: 1.3;
+  }
+
+  h4 {
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  p { margin: 0; }
+
+  a { color: var(--ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  strong { font-weight: 700; color: var(--text); }
+
+  .lede {
+    font-size: clamp(1.1rem, 2.2vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--luz);
+  }
+
+  .mono { font-family: var(--f-mono); }
+
+  .note {
+    font-size: .93rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  /* ---------- layout primitives ---------- */
+
+  .stack   { display: flex; flex-direction: column; gap: 1rem; }
+  .stack-s { display: flex; flex-direction: column; gap: .5rem; }
+  .stack-l { display: flex; flex-direction: column; gap: 2rem; }
+
+  section { padding-block: clamp(3rem, 7vw, 5.5rem); border-top: 1px solid var(--rule); }
+  section:first-of-type { border-top: none; }
+
+  .sec-head {
+    display: flex;
+    gap: 1.25rem;
+    align-items: baseline;
+    margin-bottom: 2.5rem;
+  }
+
+  .sec-num {
+    font-family: var(--f-mono);
+    font-size: .78rem;
+    font-weight: 700;
+    color: var(--luz);
+    letter-spacing: .1em;
+    padding-top: .35em;
+    flex: none;
+  }
+
+  /* ---------- masthead ---------- */
+
+  header {
+    padding-block: clamp(3.5rem, 9vw, 7rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .rule-luz {
+    width: 3.5rem;
+    height: 3px;
+    background: var(--luz);
+    margin-bottom: 1.75rem;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-family: var(--f-mono);
+    font-size: .74rem;
+    letter-spacing: .04em;
+    color: var(--text-3);
+  }
+
+  /* ---------- cards ---------- */
+
+  .card {
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr));
+  }
+
+  .grid-2 {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+  }
+
+  /* ---------- phase list ---------- */
+
+  ol.phases {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: ph;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ol.phases li {
+    counter-increment: ph;
+    display: grid;
+    grid-template-columns: 2.4rem 1fr;
+    gap: 0 1rem;
+    padding: 1.1rem 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  ol.phases li:last-child { border-bottom: 1px solid var(--rule); }
+
+  ol.phases li::before {
+    content: counter(ph);
+    font-family: var(--f-mono);
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--ink-soft);
+    width: 1.7rem;
+    height: 1.7rem;
+    display: grid;
+    place-items: center;
+    border-radius: 2px;
+    margin-top: .15rem;
+  }
+
+  /* ---------- ficha (the syllable grid) ---------- */
+
+  .ficha-shell {
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .ficha-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: .85rem 1.25rem;
+    background: var(--ground-3);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .ficha-body { padding: 1.5rem 1.25rem; }
+
+  .ficha-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: .4rem;
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .syl {
+    font-family: var(--f-mono);
+    font-size: clamp(.95rem, 3.4vw, 1.35rem);
+    font-weight: 600;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    padding: .6rem .2rem;
+    background: var(--ground);
+    color: var(--text);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s, transform .08s;
+  }
+
+  .syl:hover { border-color: var(--ink); color: var(--ink); }
+  .syl:active { transform: translateY(1px); }
+  .syl:focus-visible { outline: 2px solid var(--luz); outline-offset: 2px; }
+
+  .assembler {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+    justify-content: center;
+    min-height: 3.4rem;
+  }
+
+  .word-slot {
+    font-family: var(--f-mono);
+    font-size: clamp(1.4rem, 5vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--text);
+    min-width: 6rem;
+    text-align: center;
+    padding: .35rem .75rem;
+    border-bottom: 2px solid var(--rule);
+  }
+
+  .word-slot.empty { color: var(--text-3); font-weight: 400; letter-spacing: .02em; font-size: 1rem; }
+  .word-slot.hit   { color: var(--luz); border-bottom-color: var(--luz); }
+
+  .btn {
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .5rem .85rem;
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+
+  .btn:hover { border-color: var(--ink); color: var(--ink); }
+  .btn:focus-visible { outline: 2px solid var(--luz); outline-offset: 2px; }
+
+  .found {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule);
+    min-height: 2.5rem;
+    align-content: flex-start;
+  }
+
+  .chip {
+    font-family: var(--f-mono);
+    font-size: .78rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    padding: .28rem .6rem;
+    background: var(--luz-soft);
+    color: var(--luz);
+    border-radius: 2px;
+  }
+
+  /* ---------- tables ---------- */
+
+  .tscroll {
+    max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--rule); border-radius: 3px; background: var(--ground-2);
+  }
+
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+
+  th, td {
+    text-align: left;
+    padding: .6rem .85rem;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+
+  thead th {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    background: var(--ground-3);
+    white-space: nowrap;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+
+  td.n {
+    font-family: var(--f-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+    width: 2.5rem;
+  }
+
+  td.w {
+    font-family: var(--f-mono);
+    font-weight: 700;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+
+  td.fam { font-family: var(--f-mono); color: var(--ink); font-weight: 600; }
+
+  tr.step td { background: var(--luz-soft); }
+
+  /* ---------- code ---------- */
+
+  pre {
+    margin: 0;
+    max-width: 100%;
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 1.1rem 1.25rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-family: var(--f-mono);
+    font-size: .8rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  pre code { display: block; width: max-content; min-width: 100%; }
+
+  code { font-family: var(--f-mono); font-size: .88em; }
+
+  p code, li code, td code {
+    background: var(--ground-3);
+    padding: .1em .35em;
+    border-radius: 2px;
+    color: var(--text);
+  }
+
+  /* ---------- split (LLM vs código) ---------- */
+
+  .split { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr)); }
+
+  .split .card { display: flex; flex-direction: column; gap: .9rem; }
+
+  .tag {
+    font-family: var(--f-mono);
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: .25rem .55rem;
+    border-radius: 2px;
+    align-self: flex-start;
+  }
+
+  .tag.a { background: var(--ink-soft); color: var(--ink); }
+  .tag.b { background: var(--luz-soft); color: var(--luz); }
+
+  ul.tick { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .55rem; }
+
+  ul.tick li {
+    padding-left: 1.15rem;
+    position: relative;
+    font-size: .93rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  ul.tick li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: .62em;
+    width: .4rem;
+    height: .4rem;
+    border-radius: 50%;
+    background: var(--rule);
+  }
+
+  ul.plain { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: .5rem; color: var(--text-2); }
+  ul.plain li { font-size: .95rem; line-height: 1.55; }
+
+  /* ---------- callout ---------- */
+
+  .callout {
+    border-left: 3px solid var(--luz);
+    background: var(--luz-soft);
+    padding: 1.1rem 1.35rem;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .callout .note { color: var(--text-2); }
+
+  /* ---------- pipeline ---------- */
+
+  ol.pipe { list-style: none; margin: 0; padding: 0; counter-reset: pp; display: flex; flex-direction: column; gap: .5rem; }
+
+  ol.pipe li {
+    counter-increment: pp;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0 .9rem;
+    align-items: start;
+    background: var(--ground-2);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: .8rem 1rem;
+    font-size: .95rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  ol.pipe li::before {
+    content: counter(pp, decimal-leading-zero);
+    font-family: var(--f-mono);
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--text-3);
+    padding-top: .18em;
+  }
+
+  ol.pipe li.hi { border-color: var(--luz); background: var(--luz-soft); }
+  ol.pipe li.hi::before { color: var(--luz); }
+
+  footer {
+    padding-block: 3rem 4rem;
+    border-top: 1px solid var(--rule);
+    font-size: .85rem;
+    color: var(--text-3);
+  }
+
+  footer a { color: var(--text-2); }
+
+  /* ---------- telas estreitas ---------- */
+  @media (max-width: 40rem) {
+    body { font-size: 16px; }
+
+    pre { font-size: .71rem; padding: .85rem .9rem; }
+
+    /* os max-width inline das seções passam da viewport em telas pequenas */
+    .col, .tscroll, .ficha-shell, .callout, .grid, .grid-2, .split,
+    ol.pipe, ol.phases { max-width: 100% !important; }
+
+    .sec-head { gap: .7rem; margin-bottom: 1.5rem; }
+
+    .ficha-grid { gap: .3rem; }
+    .syl { padding: .55rem .1rem; }
+
+    .assembler { gap: .6rem; }
+    .word-slot { min-width: 4.5rem; }
+
+    ol.phases li { grid-template-columns: 1.9rem 1fr; gap: 0 .7rem; }
+    ol.pipe li { grid-template-columns: 1.6rem 1fr; gap: 0 .6rem; padding: .7rem .8rem; }
+
+    td.w { white-space: normal; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header>
+    <div class="rule-luz"></div>
+    <div class="stack-l col" style="max-width:44rem">
+      <div class="stack">
+        <span class="eyebrow">Especificação de projeto · 03</span>
+        <h1>Fluxo da sessão</h1>
+      </div>
+      <p class="lede">
+        O que acontece, passo a passo, desde a voz que pergunta “o que você comeu hoje?” até a
+        pessoa escrever no caderno as palavras que descobriu. Junta o protocolo dos nove quadros
+        (documento 01) com a descrição de aula de Carlos Rodrigues Brandão e as decisões de produto
+        tomadas em 23/10/2026.
+      </p>
+    </div>
+    <div class="meta wrap" style="padding:1.25rem 0 0">
+      <span>Uma palavra geradora por sessão</span>
+      <span>Voz → palavra → ficha → escrita</span>
+      <span>Teclado de sílabas · corrige · caderno</span>
+    </div>
+  </header>
+
+  <!-- ============ 1 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <div class="stack-s">
+        <h2>Três decisões</h2>
+        <p class="note col">
+          O método deixava algumas coisas em aberto, e um app sozinho precisa resolver o que o
+          coordenador resolvia na sala. Estas três foram decididas e regem o resto do documento.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid-2 col" style="max-width:46rem">
+      <div class="card stack-s">
+        <h3>Escrita por sílabas</h3>
+        <p class="note">O teclado mostra só as sílabas que a pessoa já aprendeu. Ela escreve
+        juntando sílabas, como fazia com a cartolina. Letra por letra não entra no MVP.</p>
+      </div>
+      <div class="card stack-s">
+        <h3>Repete e o app corrige</h3>
+        <p class="note">A pessoa repete a palavra em voz alta e o app confere. Quando a fala não
+        bate, o app modela de novo, mais devagar. A forma da correção está na seção 03.</p>
+      </div>
+      <div class="card stack-s">
+        <h3>Sugere escrever no papel</h3>
+        <p class="note">Depois da ficha, a voz convida a copiar as palavras no caderno. Segurar o
+        lápis é parte da alfabetização e o celular não substitui isso.</p>
+      </div>
+      <div class="card stack-s">
+        <h3>Inventadas valem no começo</h3>
+        <p class="note">Toda palavra formada na ficha conta. As reais e as inventadas só são
+        diferenciadas mais tarde, como no método (seção 04).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <div class="stack-s">
+        <h2>A sessão, passo a passo</h2>
+        <p class="note col">
+          Cada passo indica de onde vem: <span class="tag a">doc</span> já estava nos documentos 01 e 02,
+          <span class="tag b">fonte</span> vem da pesquisa sobre como a aula funcionava, e
+          <strong>decisão</strong> é escolha de produto.
+        </p>
+      </div>
+    </div>
+
+    <ol class="pipe col" style="max-width:46rem">
+      <li><div><strong>Motivação, uma única vez.</strong> Antes da primeira palavra, conversas sobre cenas do cotidiano até chegar em “tudo que a gente faz é cultura, logo você já é culto”. Não se repete nas sessões seguintes. <span class="tag a">doc</span></div></li>
+      <li><div><strong>Abertura: o que você fez em casa.</strong> A partir da segunda sessão, a pessoa lê em voz alta as palavras que guardou e as que escreveu no caderno. No círculo, cada encontro começava assim. <span class="tag b">fonte</span></div></li>
+      <li><div><strong>A pergunta.</strong> A voz pergunta algo da vida dela. O assunto é escolhido para render palavras do estágio em que ela está: comida, por exemplo, é cheia de sílabas simples. <span class="tag a">doc</span></div></li>
+      <li><div><strong>A conversa.</strong> Ela responde e a IA conversa sobre o assunto antes de qualquer palavra aparecer. É o lugar do debate sobre a cena: quanto mais longo, melhor. <span class="tag a">doc</span></div></li>
+      <li><div><strong>A palavra geradora.</strong> A IA propõe palavras da fala dela; o código só aceita as do estágio atual. Se nenhuma serve, a IA faz outra pergunta. Antes de seguir, a voz confirma: “ouvi BOLO, tá certo?” <span class="tag a">doc</span></div></li>
+      <li><div><strong>Palavra lida e repetida.</strong> A palavra aparece, a voz lê e cada sílaba acende enquanto é falada. A pessoa repete e o app confere. <span class="tag b">fonte</span> + <strong>decisão</strong></div></li>
+      <li><div><strong>Sílabas e famílias.</strong> <span class="mono">BO-LO</span>, depois <span class="mono">BA BE BI BO BU</span> e <span class="mono">LA LE LI LO LU</span>, uma família por vez, sempre lida e repetida. <span class="tag a">doc</span></div></li>
+      <li class="hi"><div><strong>Ficha da descoberta: ler.</strong> As famílias juntas, lidas na horizontal, na vertical e na diagonal, primeiro acompanhando a voz e depois sozinha. <span class="tag b">fonte</span></div></li>
+      <li class="hi"><div><strong>Ficha da descoberta: criar.</strong> O momento em que a pessoa “pára de repetir o que vê e começa a criar”. Ela toca nas sílabas, forma palavras e a voz lê o que ela formou. <span class="tag b">fonte</span></div></li>
+      <li><div><strong>Escrever no teclado.</strong> A voz pede uma das palavras que ela criou e ela escreve com o teclado de sílabas. <span class="tag a">doc</span> + <strong>decisão</strong></div></li>
+      <li><div><strong>Escrever no papel.</strong> A voz sugere copiar as palavras do dia no caderno, com as palavras grandes na tela para servir de modelo. <strong>decisão</strong></div></li>
+      <li><div><strong>Fechamento.</strong> As palavras do dia vão para a pastinha dela, e a voz lembra de formar mais palavras em casa para ler no próximo encontro. <span class="tag b">fonte</span></div></li>
+    </ol>
+
+    <div class="callout col" style="max-width:46rem; margin-top:2rem">
+      <p class="note">
+        <strong>Frases vêm depois, não nesta sessão.</strong> Quando a pessoa já tem sílabas
+        suficientes de várias palavras, o fechamento passa a propor frases curtas (“Benedito vive”,
+        no exemplo de Brandão) e, mais tarde, bilhetes e pequenos textos. O critério de quando
+        começar fica para o documento da progressão.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <div class="stack-s">
+        <h2>Repetir e corrigir</h2>
+        <p class="note col">
+          No círculo, o coordenador lia apontando a palavra e o grupo repetia em coro. Brandão
+          insiste que não é para decorar: a pessoa fala enquanto vê. O app não tem coro, então a
+          repetição passa a ser individual, e isso exige um retorno que o grupo dava sozinho.
+        </p>
+      </div>
+    </div>
+
+    <div class="col stack" style="max-width:46rem">
+      <ol class="phases">
+        <li>
+          <div class="stack-s">
+            <h3>Conferir com folga</h3>
+            <p class="note">O reconhecimento devolve três alternativas. Se qualquer uma delas, sem
+            acento e em minúsculas, bate com a palavra ou com a sílaba esperada, conta como certo.
+            Sotaque não é erro de leitura.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Corrigir modelando, nunca dizendo “errado”</h3>
+            <p class="note">Quando não bate, a voz lê de novo, mais devagar, e acende a sílaba que
+            ficou diferente: “vamos juntas: BO… LO”. A pessoa tenta outra vez.</p>
+          </div>
+        </li>
+        <li>
+          <div class="stack-s">
+            <h3>Duas tentativas e segue</h3>
+            <p class="note">Depois da segunda, o app segue com elogio (“isso, a gente volta nela
+            amanhã”) e marca a sílaba para revisar na abertura da próxima sessão. A sessão nunca
+            trava esperando a pronúncia perfeita.</p>
+          </div>
+        </li>
+      </ol>
+      <p class="note">
+        <strong>Por que corrigir, se o método não corrigia na hora:</strong> no grupo, quem errava
+        ouvia os outros e se ajustava sem ser apontado. Sozinha, a pessoa não tem esse modelo. A
+        correção do app ocupa esse lugar, e por isso tem a forma de quem repete junto, não de quem
+        avalia.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <div class="stack-s">
+        <h2>Palavras de pensamento e palavras mortas</h2>
+        <p class="note col">
+          Brandão registra que, na ficha, no começo vale toda combinação. As que existem são
+          <em>palavras de pensamento</em> (BOTA); as inventadas são <em>palavras mortas</em> (BENU).
+          A diferença só é explicada mais tarde.
+        </p>
+      </div>
+    </div>
+
+    <div class="col stack" style="max-width:46rem">
+      <p class="note">
+        Isso muda o papel do dicionário. A wordlist Hunspell pt-BR <strong>não serve para dizer
+        “não existe”</strong> na ficha. Ela serve para o app saber, por dentro, quais palavras são
+        reais: para comemorar mais uma palavra de pensamento, para contar a potência gerativa e para
+        escolher quais palavras pedir no teclado.
+      </p>
+      <p class="note">
+        Nas primeiras sessões a voz lê qualquer palavra formada, real ou não. A partir de um ponto
+        a definir, ela passa a conversar sobre a diferença (“essa a gente inventou; essa você usa
+        todo dia”), sem riscar nada.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">05</span>
+      <div class="stack-s">
+        <h2>Teclado de sílabas</h2>
+        <p class="note col">
+          É a versão em tela da cartolina que o aluno levava para casa.
+        </p>
+      </div>
+    </div>
+
+    <div class="col stack" style="max-width:46rem">
+      <ol class="phases">
+        <li><div class="stack-s"><h3>Só o que já foi aprendido</h3><p class="note">As teclas são as famílias das palavras geradoras já trabalhadas. A cada palavra nova, o teclado cresce. Na primeira sessão são duas ou três famílias.</p></div></li>
+        <li><div class="stack-s"><h3>Cada toque tem som</h3><p class="note">Tocar uma sílaba faz a voz lê-la; terminar a palavra faz a voz ler a palavra inteira. Quem ainda não lê se guia pelo ouvido.</p></div></li>
+        <li><div class="stack-s"><h3>Ditado curto</h3><p class="note">A voz pede palavras que a pessoa já formou na ficha e confere a escrita sílaba por sílaba, com a mesma regra de duas tentativas da seção 03.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">06</span>
+      <div class="stack-s">
+        <h2>Caderno e pastinha</h2>
+        <p class="note col">
+          No círculo, a pessoa escrevia em casa todas as palavras que conseguia formar e juntava as
+          folhas numa pasta própria. Brandão também nota que escrever à mão é difícil para muitos
+          adultos.
+        </p>
+      </div>
+    </div>
+
+    <div class="col stack" style="max-width:46rem">
+      <p class="note">
+        <strong>Caderno.</strong> No fim da sessão, a tela mostra as palavras do dia em letra
+        grande, de forma, e a voz convida: “agora escreve essas palavras no seu caderno”. O app não
+        confere o papel no MVP; a conferência acontece na abertura da sessão seguinte, quando ela lê
+        o que escreveu.
+      </p>
+      <p class="note">
+        <strong>Pastinha.</strong> Toda palavra que ela formou, real ou inventada, fica guardada no
+        celular com a data. É o que ela lê na abertura e o que mostra a ela o quanto já avançou.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">07</span>
+      <div class="stack-s">
+        <h2>O que entra no estado do aluno</h2>
+        <p class="note col">Acréscimos ao objeto salvo no <span class="mono">localStorage</span> (documento 02, seção 05).</p>
+      </div>
+    </div>
+
+    <div class="col" style="max-width:46rem">
+<pre class="mono note">{
+  motivacao_feita: false,      // passo 1, uma única vez
+  pastinha: [                  // seção 06
+    { palavra: 'bota', real: true,  data: '2026-10-24', geradora: 'bolo' },
+    { palavra: 'benu', real: false, data: '2026-10-24', geradora: 'bolo' }
+  ],
+  revisar: ['lo'],             // sílabas que passaram de duas tentativas (seção 03)
+  explicou_palavras_mortas: false
+}</pre>
+    </div>
+  </section>
+
+  <!-- ============ 8 ============ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">08</span>
+      <div class="stack-s">
+        <h2>Ainda em aberto</h2>
+      </div>
+    </div>
+
+    <ol class="pipe col" style="max-width:46rem">
+      <li><div><strong>Quando explicar palavras mortas.</strong> Depois de quantas sessões ou palavras geradoras.</div></li>
+      <li><div><strong>Quando começam as frases.</strong> Quantas famílias a pessoa precisa dominar.</div></li>
+      <li><div><strong>Conferir o caderno.</strong> Se um dia vale pedir uma foto do caderno, e o que fazer com ela.</div></li>
+      <li><div><strong>Quanto dura uma sessão.</strong> O plano estima cinco minutos de conversa; com ficha, teclado e caderno, provavelmente mais.</div></li>
+    </ol>
+  </section>
+
+  <footer class="col" style="max-width:46rem; padding:3rem 0">
+    <p class="note">
+      <strong>Fontes.</strong> A descrição da repetição, da leitura da ficha, das palavras de
+      pensamento e mortas, da escrita em casa, da pasta e da abertura com as palavras feitas em
+      casa vem de Carlos Rodrigues Brandão, <em>O que é método Paulo Freire</em> (Brasiliense,
+      coleção Primeiros Passos), disponível no
+      <a href="https://acervoapi.paulofreire.org/server/api/core/bitstreams/ddea6ca3-6cb9-4c8a-bb0f-db8a90352a70/content">Acervo Paulo Freire</a>.
+      O exemplo “tu já lê” e o roteiro da ficha nos círculos de Brasília estão na
+      <a href="https://paulofreireembrasilia.com.br/salas-da-exposicao/sala-1/o-metodo-paulo-freire-e-a-leitura-do-mundo/">exposição Paulo Freire em Brasília</a>.
+      Os nove quadros, a grade de Angicos e a fase de motivação estão no documento 01.
+    </p>
+  </footer>
+
+</div>
